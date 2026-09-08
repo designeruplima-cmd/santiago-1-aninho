@@ -1,0 +1,475 @@
+<title>Santiago — Confirmar Presença</title>
+<style>
+  :root {
+    --cream: #fbf9f4;
+    --cream2: #f2ede0;
+    --tan-light: #f7dd99;
+    --tan: #eaa200;
+    --brown: #eaa200;
+    --blue: #2e86ab;
+    --espresso: #332f28;
+    --ink: #332f28;
+    --ink-soft: #83796a;
+    --card: #ffffff;
+    --line: #ece5d4;
+    --shadow: rgba(40, 35, 25, 0.13);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--cream); }
+  body {
+    color: var(--ink);
+    font-family: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    padding: 0 0 72px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    background-image: url("assets/bg.png");
+    background-size: 100vw auto;
+    background-position: top center;
+    background-repeat: repeat-y;
+  }
+
+  .topbar {
+    position: sticky; top: 0; z-index: 10; width: 100%; background: var(--brown); color: #fff;
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase; font-variant-numeric: tabular-nums;
+  }
+  .topbar strong { font-weight: 700; }
+  .topbar-home {
+    flex: none; color: #fff; text-decoration: none; font-weight: 700;
+    background: rgba(255,255,255,0.18); border-radius: 999px; padding: 6px 12px;
+    letter-spacing: 0.02em; text-transform: none; font-size: 12.5px;
+  }
+  .topbar-home:hover { background: rgba(255,255,255,0.3); }
+  .topbar-time { flex: 1; text-align: center; }
+
+  .wrap { width: 100%; max-width: 560px; padding: 24px 20px 0; }
+
+  .page-kicker {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin: 22px 0 8px;
+  }
+  .page-title {
+    font-family: "Fraunces", serif;
+    font-weight: 640;
+    font-size: clamp(26px, 7vw, 36px);
+    text-align: center;
+    color: var(--ink);
+    margin: 0 0 8px;
+    text-wrap: balance;
+  }
+  .page-lede {
+    text-align: center;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    max-width: 36ch;
+    margin: 0 auto 28px;
+  }
+
+  .rsvp-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 28px 24px 26px;
+    box-shadow: 0 16px 34px -20px var(--shadow);
+    margin-bottom: 40px;
+  }
+  .rsvp-field { margin-bottom: 6px; }
+  .rsvp-field label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .rsvp-field input,
+  .rsvp-field textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    background: var(--cream2);
+    font-family: "Work Sans", sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    resize: vertical;
+  }
+  .rsvp-field input:focus,
+  .rsvp-field textarea:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
+
+  .rsvp-names {
+    margin: 18px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .rsvp-name-row {
+    background: var(--cream2);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .rsvp-name-fixed { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .rsvp-toggle {
+    display: flex;
+    gap: 8px;
+  }
+  .rsvp-toggle-btn {
+    flex: 1;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    border-radius: 10px;
+    padding: 9px 6px;
+    font-family: "Work Sans", sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--ink-soft);
+    cursor: pointer;
+    text-align: center;
+  }
+  .rsvp-toggle-btn.is-active[data-value="yes"] {
+    border-color: var(--brown);
+    background: var(--brown);
+    color: #fff;
+  }
+  .rsvp-toggle-btn.is-active[data-value="no"] {
+    border-color: var(--ink-soft);
+    background: var(--ink-soft);
+    color: #fff;
+  }
+  .rsvp-name-rest {
+    padding: 9px 12px;
+    border-radius: 10px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    font-family: "Work Sans", sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+  }
+  .rsvp-name-rest:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
+
+  .names-sub-hint {
+    margin: -6px 2px 4px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .names-hint {
+    margin: 14px 2px 0;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .names-hint.not-found { color: var(--tan); font-weight: 600; }
+  .reveal { display: none; }
+  .reveal.is-visible { display: block; }
+
+  .messages-title {
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: var(--ink);
+    margin: 22px 0 14px;
+    text-align: center;
+  }
+  .message-field { margin-bottom: 16px; }
+  .message-field textarea { min-height: 74px; }
+
+  .rsvp-submit {
+    width: 100%;
+    border: none;
+    border-radius: 999px;
+    padding: 14px;
+    background: var(--brown);
+    color: #fff;
+    font-family: "Fraunces", serif;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+  .rsvp-caption {
+    margin: 12px 0 0;
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-align: center;
+    font-style: italic;
+  }
+
+  .rsvp-status {
+    margin: 14px 2px 0;
+    font-size: 13.5px;
+    color: var(--ink);
+    text-align: center;
+    min-height: 18px;
+  }
+  .rsvp-status.is-error { color: var(--tan); font-weight: 600; }
+
+  footer {
+    text-align: center;
+    font-size: 11.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,380..700;1,9..144,380..700&family=Work+Sans:wght@400;500;600&display=swap">
+
+<div class="topbar">
+  <a class="topbar-home" href="index.html">← Início</a>
+  <span class="topbar-time" id="topbar">carregando…</span>
+</div>
+
+<div class="wrap">
+  <p class="page-kicker">conta com você</p>
+  <h1 class="page-title">Confirme sua presença</h1>
+  <p class="page-lede">Preencha o código da sua família, marque quem vem e complete o nome de cada um.</p>
+
+  <div class="rsvp-card">
+    <div class="rsvp-field">
+      <label for="familyCode">Código da família</label>
+      <input id="familyCode" type="text" placeholder="ex: NOME01" autocomplete="off">
+    </div>
+    <p class="names-hint" id="namesHint">Digite o código acima para ver quem mora na sua casa.</p>
+
+    <div class="reveal" id="revealSection">
+      <p class="names-sub-hint">Complete o sobrenome de quem vem — nos ajuda a fechar a lista certinha com o salão.</p>
+      <div class="rsvp-names" id="namesList"></div>
+
+      <p class="messages-title">Deixe um recadinho 💌</p>
+      <div class="message-field rsvp-field">
+        <label for="msgParents">Mensagem para os pais</label>
+        <textarea id="msgParents" placeholder="Escreva aqui..."></textarea>
+      </div>
+      <div class="message-field rsvp-field">
+        <label for="msgSanti">Mensagem para o Santiago</label>
+        <textarea id="msgSanti" placeholder="Escreva aqui..."></textarea>
+      </div>
+
+      <button class="rsvp-submit" type="button" id="confirmBtn">Confirmar presença</button>
+      <p class="rsvp-status" id="rsvpStatus"></p>
+    </div>
+  </div>
+
+  <footer>Vila Encantada 1 · Rio de Janeiro</footer>
+</div>
+
+<script>
+  (function () {
+    var target = new Date("2026-11-28T12:00:00-03:00").getTime();
+    var bar = document.getElementById("topbar");
+    function tick() {
+      var diff = target - Date.now();
+      if (diff <= 0) { bar.textContent = "É hoje! ✈️"; return; }
+      var d = Math.floor(diff / 86400000);
+      var h = Math.floor((diff % 86400000) / 3600000);
+      var m = Math.floor((diff % 3600000) / 60000);
+      var s = Math.floor((diff % 60000) / 1000);
+      bar.innerHTML = "Faltam <strong>" + d + "</strong>d · <strong>" + String(h).padStart(2,"0") + "</strong>h · <strong>" + String(m).padStart(2,"0") + "</strong>min · <strong>" + String(s).padStart(2,"0") + "</strong>s";
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+
+  // ---- lookup de família por código, vindo da planilha "Santi - Lista de Famílias" ----
+  (function () {
+    var FAMILIES = {
+      // códigos de teste, não usar pra confirmar de verdade
+      "NOME01": ["Fulano", "Fulana"],
+      "NOME02": ["Cicero"],
+
+      "NORMA01": ["Norma", "Aloma", "Alanna"],
+      "RAUL02": ["Raulino"],
+      "PAULA03": ["Paula", "Lenivaldo", "Maria Clara", "Caio"],
+      "JOSEANE04": ["Joseane", "Claudio", "Bratriz", "Leticia"],
+      "AMANDINHA5": ["Amanda"],
+      "DANIELE6": ["Daniele", "Nildete (Deta)", "Edimilson", "Ruberlandia"],
+      "NELMA7": ["Nelma", "Paulo Robson", "Maria Julia"],
+      "TANIA8": ["Tanie", "Dário"],
+      "MAURA": ["Maura", "Micka", "Maria Flor"],
+      "CAROL": ["Carol", "Pedro", "Elivania"],
+      "ANNANZA": ["Annanza"],
+      "KENNIA": ["Kennia", "Agatha"],
+      "VIVIAN": ["Vivian", "Andre", "Maria Eduarda", "Gabriel"],
+      "LUCIA": ["Lucia", "Guilherme"],
+      "JUZAO": ["Julia", "Isabele"],
+      "WENDELL": ["Wendell", "Claudia"],
+      "LUAN": ["Luan", "Marcelle", "Noah"],
+      "LUCAS": ["Lucas", "João"],
+      "PEIXONA": ["Cristina", "Gabriella", "Mayara"],
+      "RIOCLASSICA": ["Adamis", "Fernanda", "Isabel", "Tereza"],
+      "MION": ["Alexey", "Camila", "Joana", "José", "João", "Maria"],
+      "RICARDO": ["Carol", "Ricardo", "Ester"],
+      "ASTRO": ["Hermano", "Tainá", "Adriana", "Pedrinho"],
+      "PINGO": ["Edson", "Adriana", "Luiza", "Jonny", "Vinicius"],
+      "MOSQUITO": ["Luiz Felipe", "Beatriz"],
+      "BUIU": ["Renato", "Marisa"],
+      "TATA": ["Renata", "Flavio", "Davi"],
+      "CACAU": ["Vinicius"],
+      "GEMIOS01": ["Danilo", "Lais", "Mateos", "Felipe"],
+      "GUIDIN": ["Emanuelle", "Ben Hur", "Guido"],
+      "RAFA": ["Rafaela", "Thiago", "Kaylane", "Heitor"],
+      "MARI": ["Mariana", "Giovane", "Maria Luiza", "Estela"],
+      "PENTEADO": ["Fabiana", "Roberto", "Pedro", "Davi", "Heitor"],
+      "ALDI": ["Aldilene", "Leonardo"],
+      "MAGNO": ["Magno", "Nathalia", "Sofia", "José", "Suzana", "Sara"],
+      "MARIANA": ["Mariana", "Edimar"],
+      "JOYCE": ["Joyce"],
+      "QUEQUEL": ["Raquel"],
+      "PAZ": ["Jose", "Maria da Paz"],
+      "GEMIOS02": ["Pablo", "Sony"]
+    };
+
+    var codeInput = document.getElementById("familyCode");
+    var hint = document.getElementById("namesHint");
+    var reveal = document.getElementById("revealSection");
+    var namesList = document.getElementById("namesList");
+    var confirmBtn = document.getElementById("confirmBtn");
+
+    function renderNames(names) {
+      namesList.innerHTML = "";
+      names.forEach(function (name) {
+        var row = document.createElement("div");
+        row.className = "rsvp-name-row";
+        row.dataset.name = name;
+        row.dataset.confirmed = "yes";
+
+        var fixed = document.createElement("div");
+        fixed.className = "rsvp-name-fixed";
+        fixed.textContent = name;
+
+        var toggle = document.createElement("div");
+        toggle.className = "rsvp-toggle";
+        var yesBtn = document.createElement("button");
+        yesBtn.type = "button";
+        yesBtn.className = "rsvp-toggle-btn is-active";
+        yesBtn.dataset.value = "yes";
+        yesBtn.textContent = "Confirmar presença";
+        var noBtn = document.createElement("button");
+        noBtn.type = "button";
+        noBtn.className = "rsvp-toggle-btn";
+        noBtn.dataset.value = "no";
+        noBtn.textContent = "Não confirmar presença";
+        toggle.appendChild(yesBtn);
+        toggle.appendChild(noBtn);
+
+        var rest = document.createElement("input");
+        rest.type = "text";
+        rest.className = "rsvp-name-rest";
+        rest.placeholder = "completar sobrenome (opcional)";
+        rest.autocomplete = "off";
+
+        function setState(value) {
+          row.dataset.confirmed = value;
+          yesBtn.classList.toggle("is-active", value === "yes");
+          noBtn.classList.toggle("is-active", value === "no");
+          rest.style.display = value === "yes" ? "" : "none";
+        }
+        yesBtn.addEventListener("click", function () { setState("yes"); });
+        noBtn.addEventListener("click", function () { setState("no"); });
+
+        row.appendChild(fixed);
+        row.appendChild(toggle);
+        row.appendChild(rest);
+        namesList.appendChild(row);
+      });
+    }
+
+    codeInput.addEventListener("input", function () {
+      var code = codeInput.value.trim().toUpperCase();
+      if (!code) {
+        reveal.classList.remove("is-visible");
+        hint.textContent = "Digite o código acima para ver quem mora na sua casa.";
+        hint.classList.remove("not-found");
+        return;
+      }
+      var names = FAMILIES[code];
+      if (names) {
+        renderNames(names);
+        reveal.classList.add("is-visible");
+        hint.textContent = "Encontramos sua família! Marque quem vem.";
+        hint.classList.remove("not-found");
+      } else {
+        reveal.classList.remove("is-visible");
+        hint.textContent = "Não encontramos esse código — confira com quem te chamou.";
+        hint.classList.add("not-found");
+      }
+    });
+
+    var SCRIPT_URL = "__SCRIPT_URL__"; // cole aqui a URL do Apps Script quando publicar
+
+    confirmBtn.addEventListener("click", function () {
+      var code = codeInput.value.trim().toUpperCase();
+      var checked = [];
+      var notComing = [];
+      Array.prototype.forEach.call(namesList.querySelectorAll(".rsvp-name-row"), function (row) {
+        if (row.dataset.confirmed !== "yes") {
+          notComing.push(row.dataset.name);
+          return;
+        }
+        var rest = row.querySelector(".rsvp-name-rest").value.trim();
+        checked.push(rest ? row.dataset.name + " " + rest : row.dataset.name);
+      });
+
+      var msgParents = document.getElementById("msgParents").value.trim();
+      var msgSanti = document.getElementById("msgSanti").value.trim();
+      var status = document.getElementById("rsvpStatus");
+
+      function whatsappFallback() {
+        var text = "Confirmação de presença — festa do Santiago\n";
+        text += "Código: " + code + "\n";
+        text += "Vão: " + (checked.length ? checked.join(", ") : "ninguém") + "\n";
+        if (notComing.length) text += "Não vão: " + notComing.join(", ") + "\n";
+        if (msgParents) text += "\nRecado para os pais: " + msgParents;
+        if (msgSanti) text += "\nRecado para o Santiago: " + msgSanti;
+        window.open("https://wa.me/5521969390602?text=" + encodeURIComponent(text), "_blank");
+      }
+
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = "Enviando...";
+      status.textContent = "";
+      status.classList.remove("is-error");
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          code: code, coming: checked, notComing: notComing,
+          msgParents: msgParents, msgSanti: msgSanti
+        })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = "Confirmar presença";
+          if (data.status === "ok") {
+            status.textContent = "Presença confirmada! Já registramos na nossa lista, obrigado 💛";
+          } else if (data.status === "already_confirmed") {
+            status.textContent = "Esse código já confirmou presença antes. Se precisar mudar algo, fale direto com o Uriel.";
+            status.classList.add("is-error");
+          } else {
+            status.textContent = "Não encontramos esse código — confira com quem te chamou.";
+            status.classList.add("is-error");
+          }
+        })
+        .catch(function () {
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = "Confirmar presença";
+          status.textContent = "Não conseguimos confirmar automaticamente — abrindo o WhatsApp como alternativa.";
+          status.classList.add("is-error");
+          whatsappFallback();
+        });
+    });
+  })();
+</script>
