@@ -32,7 +32,8 @@ function doGet(e) {
     if (rowCode !== code) continue;
 
     var names = splitNames(values[i][3]); // coluna D - Nomes individuais da casa
-    var alreadyConfirmed = !!String(values[i][6] || "").trim(); // coluna G - Confirmado
+    var isTestCode = TEST_CODES.indexOf(rowCode) > -1;
+    var alreadyConfirmed = !isTestCode && !!String(values[i][6] || "").trim(); // coluna G - Confirmado
 
     return ContentService.createTextOutput(JSON.stringify({
       found: true, names: names, alreadyConfirmed: alreadyConfirmed
