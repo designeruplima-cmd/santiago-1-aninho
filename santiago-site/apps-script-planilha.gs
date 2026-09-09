@@ -91,10 +91,8 @@ function doPost(e) {
       sheet.getRange(i + 1, 10).setValue(notComing);                                // J - Não vão
       sheet.getRange(i + 1, 11).setValue(new Date());                               // K - Data da confirmação
 
-      if (!isTestCode) {
-        var familyName = String(values[i][2] || "");
-        logConfirmacaoParaRevisao(code, familyName, coming, notComing, msgParents, msgSanti);
-      }
+      var familyName = String(values[i][2] || "");
+      logConfirmacaoParaRevisao(code, familyName, coming, notComing, msgParents, msgSanti);
 
       return ContentService.createTextOutput(JSON.stringify({ status: "ok" }))
         .setMimeType(ContentService.MimeType.JSON);
