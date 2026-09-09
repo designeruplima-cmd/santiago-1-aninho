@@ -33,23 +33,22 @@
 
   .topbar {
     position: sticky; top: 0; z-index: 10; width: 100%; background: var(--brown); color: #fff;
-    display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600;
+    text-align: center; padding: 13px 16px; font-size: 17px; font-weight: 700;
     letter-spacing: 0.06em; text-transform: uppercase; font-variant-numeric: tabular-nums;
   }
   .topbar strong { font-weight: 700; }
-  .topbar-home {
-    flex: none; color: #fff; text-decoration: none; font-weight: 700;
-    background: rgba(255,255,255,0.18); border-radius: 999px; padding: 6px 12px;
-    letter-spacing: 0.02em; text-transform: none; font-size: 12.5px;
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    text-decoration: none; color: var(--brown); font-weight: 700;
+    font-size: 18px; margin: 4px 0 16px;
   }
-  .topbar-home:hover { background: rgba(255,255,255,0.3); }
-  .topbar-time { flex: 1; text-align: center; }
+  .back-link:hover { text-decoration: underline; }
 
   .wrap { width: 100%; max-width: 560px; padding: 24px 20px 0; }
 
   .page-kicker {
     text-align: center;
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--blue);
@@ -67,7 +66,7 @@
   .page-lede {
     text-align: center;
     color: var(--ink-soft);
-    font-size: 14.5px;
+    font-size: 16.5px;
     max-width: 36ch;
     margin: 0 auto 28px;
   }
@@ -81,7 +80,7 @@
   .how-to-title {
     font-family: "Fraunces", serif;
     font-weight: 620;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--ink);
     margin: 0 0 10px;
   }
@@ -91,7 +90,7 @@
     color: var(--ink);
   }
   .how-to li {
-    font-size: 15.5px;
+    font-size: 17.5px;
     line-height: 1.65;
     margin-bottom: 8px;
   }
@@ -113,10 +112,10 @@
     font-family: "Fraunces", serif; font-weight: 640; font-size: 22px;
     color: var(--ink); margin: 0 0 8px;
   }
-  .success-lede { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 24px; line-height: 1.5; }
+  .success-lede { color: var(--ink-soft); font-size: 16.5px; margin: 0 0 24px; line-height: 1.5; }
   .success-btn {
     display: inline-block; text-decoration: none; border-radius: 999px; padding: 13px 28px;
-    background: var(--brown); color: #fff; font-family: "Fraunces", serif; font-weight: 600; font-size: 15px;
+    background: var(--brown); color: #fff; font-family: "Fraunces", serif; font-weight: 600; font-size: 17px;
   }
 
   .rsvp-card {
@@ -130,7 +129,7 @@
   .rsvp-field { margin-bottom: 6px; }
   .rsvp-field label {
     display: block;
-    font-size: 11px;
+    font-size: 13px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--ink-soft);
@@ -144,7 +143,7 @@
     border: 1.5px solid var(--line);
     background: var(--cream2);
     font-family: "Work Sans", sans-serif;
-    font-size: 15px;
+    font-size: 17px;
     color: var(--ink);
     resize: vertical;
   }
@@ -165,7 +164,7 @@
     flex-direction: column;
     gap: 8px;
   }
-  .rsvp-name-fixed { font-size: 15px; font-weight: 600; color: var(--ink); }
+  .rsvp-name-fixed { font-size: 17px; font-weight: 600; color: var(--ink); }
   .rsvp-toggle {
     display: flex;
     gap: 8px;
@@ -177,7 +176,7 @@
     border-radius: 10px;
     padding: 9px 6px;
     font-family: "Work Sans", sans-serif;
-    font-size: 12.5px;
+    font-size: 14.5px;
     font-weight: 600;
     line-height: 1.25;
     color: var(--ink-soft);
@@ -200,28 +199,28 @@
     border: 1.5px solid var(--line);
     background: #fff;
     font-family: "Work Sans", sans-serif;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--ink);
   }
   .rsvp-name-rest:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
 
   .names-sub-hint {
     margin: -6px 2px 4px;
-    font-size: 12.5px;
+    font-size: 14.5px;
     color: var(--ink-soft);
     font-style: italic;
   }
 
   .names-hint {
     margin: 14px 2px 0;
-    font-size: 13px;
+    font-size: 15px;
     color: var(--ink-soft);
   }
   .names-hint.not-found { color: var(--tan); font-weight: 600; }
 
   .code-warning {
     margin: 10px 2px 0;
-    font-size: 12.5px;
+    font-size: 14.5px;
     color: var(--ink-soft);
     font-style: italic;
   }
@@ -231,7 +230,7 @@
   .messages-title {
     font-family: "Fraunces", serif;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 18px;
     color: var(--ink);
     margin: 22px 0 14px;
     text-align: center;
@@ -248,13 +247,13 @@
     color: #fff;
     font-family: "Fraunces", serif;
     font-weight: 600;
-    font-size: 16px;
+    font-size: 18px;
     cursor: pointer;
     margin-top: 6px;
   }
   .rsvp-caption {
     margin: 12px 0 0;
-    font-size: 12px;
+    font-size: 14px;
     color: var(--ink-soft);
     text-align: center;
     font-style: italic;
@@ -262,7 +261,7 @@
 
   .rsvp-status {
     margin: 14px 2px 0;
-    font-size: 13.5px;
+    font-size: 15.5px;
     color: var(--ink);
     text-align: center;
     min-height: 18px;
@@ -271,7 +270,7 @@
 
   footer {
     text-align: center;
-    font-size: 11.5px;
+    font-size: 13.5px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--ink-soft);
@@ -280,12 +279,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,380..700;1,9..144,380..700&family=Work+Sans:wght@400;500;600&display=swap">
 
-<div class="topbar">
-  <a class="topbar-home" href="index.html">← Início</a>
-  <span class="topbar-time" id="topbar">carregando…</span>
-</div>
+<div class="topbar" id="topbar">carregando…</div>
 
 <div class="wrap">
+  <a class="back-link" href="index.html">← Início</a>
   <p class="page-kicker">conta com você</p>
   <h1 class="page-title">Confirme sua presença</h1>
   <p class="page-lede">Preencha o código da sua família, marque quem vem e complete o nome de cada um.</p>
