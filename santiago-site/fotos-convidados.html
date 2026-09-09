@@ -86,8 +86,9 @@
   }
   .picker-btn:active { background: var(--tan-light); }
 
-  .photo-counter { margin: 12px 2px 10px; font-size: 14.5px; color: var(--ink-soft); }
+  .photo-counter { margin: 12px 2px 4px; font-size: 14.5px; color: var(--ink-soft); }
   .photo-counter.is-warning { color: var(--tan); font-weight: 600; }
+  .photo-limits-note { margin: 0 2px 10px; font-size: 13px; color: var(--ink-soft); font-style: italic; }
 
   .photo-preview-grid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 6px;
@@ -102,6 +103,7 @@
     content: "..."; color: var(--ink-soft); font-size: 20px; font-weight: 700;
   }
   .photo-thumb.is-error { border-color: var(--tan); }
+  .photo-thumb.is-video { display: flex; align-items: center; justify-content: center; font-size: 26px; }
   .photo-thumb-remove {
     position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%;
     border: none; background: rgba(20,16,10,0.65); color: #fff; font-size: 13px; line-height: 1;
@@ -154,12 +156,13 @@
 
     <div class="photo-picker">
       <button class="picker-btn" type="button" id="btnCamera">📷 Tirar foto agora</button>
-      <button class="picker-btn" type="button" id="btnGallery">🖼️ Escolher da galeria</button>
+      <button class="picker-btn" type="button" id="btnGallery">🖼️ Escolher foto ou vídeo</button>
     </div>
     <input type="file" id="inputCamera" accept="image/*" capture="environment" hidden>
-    <input type="file" id="inputGallery" accept="image/*" multiple hidden>
+    <input type="file" id="inputGallery" accept="image/*,video/*" multiple hidden>
 
-    <p class="photo-counter" id="photoCounter">Nenhuma foto selecionada ainda (máx. 8 por envio)</p>
+    <p class="photo-counter" id="photoCounter">Nenhum arquivo selecionado ainda (máx. 8 por envio)</p>
+    <p class="photo-limits-note">Vídeos: até 20MB e uns 10-15 segundos (dependendo da qualidade do celular).</p>
     <div class="photo-preview-grid" id="previewGrid"></div>
 
     <button class="rsvp-submit" type="button" id="sendBtn" disabled>Enviar fotos</button>
@@ -193,6 +196,7 @@
     var MAX_LONG_EDGE = 1600;
     var TARGET_MAX_BYTES = 1.2 * 1024 * 1024;
     var RAW_FALLBACK_MAX = 6 * 1024 * 1024;
+    var MAX_VIDEO_BYTES = 20 * 1024 * 1024;
 
     var queue = []; // { id, status: 'processing'|'ready'|'ready-raw'|'error', base64, mimeType, filename, previewUrl, errorMsg }
 
@@ -219,6 +223,9 @@
           errBox.className = "photo-thumb-error-msg";
           errBox.textContent = item.errorMsg || "Não foi possível processar essa foto.";
           thumb.appendChild(errBox);
+        } else if (item.isVideo) {
+          thumb.classList.add("is-video");
+          thumb.textContent = "🎬";
         } else if (item.previewUrl) {
           var img = document.createElement("img");
           img.src = item.previewUrl;
@@ -246,10 +253,10 @@
     function updateCounter() {
       var n = queue.length;
       if (n === 0) {
-        counter.textContent = "Nenhuma foto selecionada ainda (máx. " + MAX_PHOTOS + " por envio)";
+        counter.textContent = "Nenhum arquivo selecionado ainda (máx. " + MAX_PHOTOS + " por envio)";
         counter.classList.remove("is-warning");
       } else {
-        counter.textContent = n + " de " + MAX_PHOTOS + " fotos selecionadas";
+        counter.textContent = n + " de " + MAX_PHOTOS + " arquivos selecionados";
         counter.classList.toggle("is-warning", n >= MAX_PHOTOS);
       }
     }
@@ -295,11 +302,41 @@
       });
     }
 
+    function processVideoFile(file, item) {
+      if (file.size > MAX_VIDEO_BYTES) {
+        item.status = "error";
+        item.errorMsg = "Vídeo muito grande (máx. 20MB) — tenta um clipe mais curto.";
+        renderPreview();
+        updateSendButton();
+        return;
+      }
+      readAsBase64(file)
+        .then(function (b64) {
+          item.base64 = b64;
+          item.mimeType = file.type || "video/mp4";
+          item.isVideo = true;
+          item.status = "ready-raw";
+        })
+        .catch(function () {
+          item.status = "error";
+          item.errorMsg = "Não foi possível processar esse vídeo.";
+        })
+        .then(function () {
+          renderPreview();
+          updateSendButton();
+        });
+    }
+
     function processFile(file) {
       var item = { id: uid(), status: "processing", filename: file.name || "foto.jpg" };
       queue.push(item);
       renderPreview();
       updateCounter();
+
+      if (file.type && file.type.indexOf("video/") === 0) {
+        processVideoFile(file, item);
+        return;
+      }
 
       loadBitmapOrImage(file)
         .then(function (bitmap) {
