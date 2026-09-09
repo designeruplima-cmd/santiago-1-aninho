@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Gerador de ícones do painel</title>
+<style>
+  body { font-family: sans-serif; padding: 24px; background: #fbf9f4; }
+  h1 { font-size: 18px; }
+  p { color: #555; max-width: 480px; }
+  .row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 20px; }
+  .item { text-align: center; }
+  canvas { border: 1px solid #ddd; border-radius: 8px; background: #fff; }
+  a.download {
+    display: block; margin-top: 8px; padding: 8px 14px; background: #eaa200;
+    color: #fff; text-decoration: none; border-radius: 8px; font-size: 14px;
+  }
+</style>
+</head>
+<body>
+  <h1>Gerador de ícones do Painel Santiago</h1>
+  <p>
+    Página de uso único (não faz parte do site, não é linkada em lugar nenhum).
+    Abra esta página uma vez, clique nos 3 links "Baixar", e salve os arquivos
+    baixados dentro da pasta <code>painel/icons/</code> com os nomes exatos:
+    <code>icon-192.png</code>, <code>icon-512.png</code> e
+    <code>icon-512-maskable.png</code>.
+  </p>
+  <div class="row" id="row"></div>
+
+  <script>
+    function drawIcon(size, maskable) {
+      var canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      var ctx = canvas.getContext("2d");
+
+      // fundo
+      ctx.fillStyle = "#eaa200";
+      ctx.fillRect(0, 0, size, size);
+
+      // pro ícone "maskable", o conteúdo precisa ficar numa área de segurança
+      // menor (o SO pode recortar as bordas em círculo) — encolhe o balão.
+      var scale = maskable ? 0.6 : 0.82;
+      var fontSize = Math.round(size * scale);
+
+      ctx.font = fontSize + "px system-ui, 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("🎈", size / 2, size / 2 + size * 0.04);
+
+      return canvas;
+    }
+
+    var configs = [
+      { size: 192, maskable: false, name: "icon-192.png" },
+      { size: 512, maskable: false, name: "icon-512.png" },
+      { size: 512, maskable: true, name: "icon-512-maskable.png" }
+    ];
+
+    var row = document.getElementById("row");
+    configs.forEach(function (cfg) {
+      var canvas = drawIcon(cfg.size, cfg.maskable);
+      var displaySize = Math.min(cfg.size, 160);
+      canvas.style.width = displaySize + "px";
+      canvas.style.height = displaySize + "px";
+
+      var item = document.createElement("div");
+      item.className = "item";
+      var label = document.createElement("div");
+      label.textContent = cfg.name;
+      item.appendChild(canvas);
+      item.appendChild(label);
+
+      var link = document.createElement("a");
+      link.className = "download";
+      link.textContent = "Baixar";
+      link.download = cfg.name;
+      link.href = canvas.toDataURL("image/png");
+      item.appendChild(link);
+
+      row.appendChild(item);
+    });
+  </script>
+</body>
+</html>
