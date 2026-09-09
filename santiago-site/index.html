@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Santiago — 1 Aninho</title>
 <style>
   :root {
@@ -31,10 +36,12 @@
     flex-direction: column;
     align-items: center;
     position: relative;
-    background-image: url("assets/bg.png");
-    background-size: 100vw auto;
-    background-position: top center;
-    background-repeat: no-repeat;
+    background-image:
+      linear-gradient(180deg, var(--cream) 0, var(--cream) 110px, rgba(251,249,244,.65) 220px, rgba(251,249,244,0) 380px),
+      url("assets/bg.png");
+    background-repeat: no-repeat, no-repeat;
+    background-position: top center, top center;
+    background-size: 100% 380px, 122vw auto;
   }
 
   .topbar {
@@ -64,36 +71,31 @@
   /* ---------- nav grid ---------- */
   .nav-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 12px;
     margin: 6px 0 20px;
   }
   .nav-tile {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    text-align: center;
+    justify-content: flex-start;
+    gap: 14px;
+    text-align: left;
     text-decoration: none;
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: 20px;
-    padding: 22px 12px;
+    padding: 18px 20px;
     box-shadow: 0 14px 30px -20px var(--shadow);
     color: var(--ink);
   }
-  .nav-tile svg { color: var(--brown); }
+  .nav-tile svg { color: var(--brown); flex: none; }
   .nav-tile span {
     font-family: "Fraunces", serif;
     font-weight: 600;
     font-size: 16.5px;
     line-height: 1.25;
-  }
-  .nav-tile.wide {
-    grid-column: 1 / -1;
-    flex-direction: row;
-    padding: 18px 12px;
   }
 
   .hero-logo {
@@ -136,6 +138,8 @@
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,380..700;1,9..144,380..700&family=Work+Sans:wght@400;500;600&display=swap">
+</head>
+<body>
 
 <div class="topbar" id="topbar">carregando contagem…</div>
 
@@ -160,7 +164,7 @@
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M8 12.5l2.5 2.5L16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       <span>Confirmar presença</span>
     </a>
-    <a class="nav-tile wide" href="presente.html">
+    <a class="nav-tile" href="presente.html">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="9" width="18" height="11" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M12 9v11M7.5 9a2.5 2.5 0 010-5C10 4 12 9 12 9c0 0 2-5 4.5-5a2.5 2.5 0 010 5" stroke="currentColor" stroke-width="1.8"/></svg>
       <span>Sugestão de presente</span>
     </a>
@@ -186,3 +190,5 @@
     setInterval(tick, 1000);
   })();
 </script>
+</body>
+</html>
