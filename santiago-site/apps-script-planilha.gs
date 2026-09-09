@@ -15,11 +15,33 @@ var TEST_CODES = ["ANATESTE", "URIELTESTE"];
 var REVIEW_SHEET_ID = "18FToLa0bzzg65OQ-BKP-bvhnaHV8QrtbxW0A2CMt6tE";
 var REVIEW_TAB_NAME = "Confirmações a revisar";
 
+// ---------------------------------------------------------------------------
+// Painel PWA (Uriel + esposa) — tudo daqui pra baixo até a próxima linha de
+// travessões é usado só pelo painel em painel/, nunca pelo site dos convidados.
+// ---------------------------------------------------------------------------
+var PANEL_PIN = "1128"; // PIN de acesso ao painel (28/11, data da festa)
+var CONFIG_TAB_NAME = "Configuração";
+var TEMPLATE_KEY = "template_whatsapp";
+var DEFAULT_TEMPLATE =
+  "Oi, família {nome}! Tudo bem?\n\n" +
+  "O Santiago te convida pra festa do aniversário de 1 aninho dele — vai ser uma alegria " +
+  "ter vocês lá pra brincar e comemorar com a gente!\n\n" +
+  "Guarda a data: 28 de novembro. Saiba mais e confirme sua presença no link abaixo:\n\n" +
+  "https://designeruplima-cmd.github.io/santiago-1-aninho/santiago-site/index.html\n\n" +
+  "Pra confirmar, usa esse código da família de vocês: *{codigo}*\n\n" +
+  "Só um detalhe: o código vale pra família toda — assim que uma pessoa confirmar, ele já " +
+  "fica marcado como usado. Então combinem entre vocês quem vai confirmar, porque se outra " +
+  "pessoa tentar depois, vai aparecer que já foi confirmado.\n\n" +
+  "Esperamos vocês!";
+
 /**
  * Busca a família pelo código (usado pela tela de confirmar presença pra
  * mostrar os nomes de quem mora na casa antes de confirmar).
  */
 function doGet(e) {
+  var action = String((e && e.parameter && e.parameter.action) || "").trim();
+  if (action) return routeAction(action, e, null);
+
   var code = String((e && e.parameter && e.parameter.code) || "").trim().toUpperCase();
   if (!code) {
     return ContentService.createTextOutput("OK — endpoint da lista de famílias do Santiago está ativo.");
@@ -62,6 +84,10 @@ function splitNames(raw) {
 }
 
 function doPost(e) {
+  var earlyAction = "";
+  try { earlyAction = String((JSON.parse(e.postData.contents) || {}).action || "").trim(); } catch (errEarly) {}
+  if (earlyAction) return routeAction(earlyAction, e, JSON.parse(e.postData.contents));
+
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
   try {
@@ -127,6 +153,236 @@ function logConfirmacaoParaRevisao(code, familyName, coming, notComing, msgParen
     // Uma falha aqui não deve impedir a confirmação de valer na planilha principal.
     Logger.log("Não consegui gravar na aba de revisão: " + errReview);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Painel PWA — roteador de ações e implementações. Só é acionado quando vem
+// um parâmetro "action" (GET) ou campo "action" no corpo (POST); sem isso,
+// doGet/doPost seguem o comportamento de sempre, usado por confirmar.html.
+// ---------------------------------------------------------------------------
+
+function routeAction(action, e, body) {
+  try {
+    if (!checkPin(e, body)) return jsonOut({ status: "unauthorized" });
+    switch (action) {
+      case "listAll":      return actionListAll();
+      case "addFamily":    return actionAddFamily(body || {});
+      case "editFamily":   return actionEditFamily(body || {});
+      case "deleteFamily": return actionDeleteFamily(body || {});
+      case "getTemplate":  return actionGetTemplate();
+      case "setTemplate":  return actionSetTemplate(body || {});
+      case "listGuests":   return actionListGuests();
+      case "toggleGuest":  return actionToggleGuestConfirmed(body || {});
+      default:
+        return jsonOut({ status: "error", message: "ação desconhecida: " + action });
+    }
+  } catch (err) {
+    return jsonOut({ status: "error", message: String(err) });
+  }
+}
+
+function checkPin(e, body) {
+  var pin = String((body && body.pin) || (e && e.parameter && e.parameter.pin) || "").trim();
+  return !!pin && pin === PANEL_PIN;
+}
+
+function jsonOut(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function actionListAll() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  var values = sheet.getDataRange().getValues();
+  var families = [];
+  for (var i = 1; i < values.length; i++) {
+    var row = values[i];
+    if (!String(row[0]).trim()) continue; // pula linhas em branco
+    families.push({
+      rowIndex: i + 1,
+      codigo: String(row[0]).trim().toUpperCase(),
+      numero: row[1],
+      nome: String(row[2] || ""),
+      pessoasRaw: String(row[3] || ""),
+      pessoas: splitNames(row[3]),
+      telefone: String(row[4] || ""),
+      confirmado: String(row[6] || ""),
+      msgParents: String(row[7] || ""),
+      msgSanti: String(row[8] || ""),
+      naoConfirmado: String(row[9] || ""),
+      dataConfirmacao: row[10] ? String(row[10]) : ""
+    });
+  }
+  return jsonOut({ status: "ok", families: families });
+}
+
+function actionAddFamily(body) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+    var values = sheet.getDataRange().getValues();
+    var existingCodes = {};
+    for (var i = 1; i < values.length; i++) {
+      var c = String(values[i][0]).trim().toUpperCase();
+      if (c) existingCodes[c] = true;
+    }
+    TEST_CODES.forEach(function (c) { existingCodes[c] = true; });
+
+    var nome = String(body.nome || "").trim();
+    var pessoas = String(body.pessoas || "").trim();
+    var telefone = String(body.telefone || "").trim();
+    if (!nome) return jsonOut({ status: "error", message: "Nome da família é obrigatório." });
+
+    var manualCode = String(body.codigo || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+    var code;
+    if (manualCode) {
+      if (existingCodes[manualCode]) return jsonOut({ status: "duplicate_code", codigo: manualCode });
+      code = manualCode;
+    } else {
+      code = generateFamilyCode(nome, existingCodes);
+    }
+
+    var lastNumero = values.length > 1 ? Number(values[values.length - 1][1]) || (values.length - 1) : 0;
+    var nextNumero = lastNumero + 1;
+
+    sheet.appendRow([code, nextNumero, nome, pessoas, telefone]);
+
+    return jsonOut({
+      status: "ok",
+      family: { codigo: code, numero: nextNumero, nome: nome, pessoasRaw: pessoas, pessoas: splitNames(pessoas), telefone: telefone }
+    });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function generateFamilyCode(nome, existingCodes) {
+  var base = nome.toUpperCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^A-Z]/g, "")
+    .slice(0, 6) || "FAMILIA";
+  var n = 1;
+  var candidate = base + String(n).padStart(2, "0");
+  while (existingCodes[candidate]) {
+    n++;
+    candidate = base + String(n).padStart(2, "0");
+  }
+  return candidate;
+}
+
+function actionEditFamily(body) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var codigo = String(body.codigo || "").trim().toUpperCase();
+    if (!codigo) return jsonOut({ status: "error", message: "Código é obrigatório." });
+
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+    var values = sheet.getDataRange().getValues();
+    for (var i = 1; i < values.length; i++) {
+      var rowCode = String(values[i][0]).trim().toUpperCase();
+      if (rowCode !== codigo) continue;
+
+      if (body.nome !== undefined) sheet.getRange(i + 1, 3).setValue(String(body.nome || ""));
+      if (body.pessoas !== undefined) sheet.getRange(i + 1, 4).setValue(String(body.pessoas || ""));
+      if (body.telefone !== undefined) sheet.getRange(i + 1, 5).setValue(String(body.telefone || ""));
+
+      return jsonOut({ status: "ok" });
+    }
+    return jsonOut({ status: "not_found", codigo: codigo });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function actionDeleteFamily(body) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var codigo = String(body.codigo || "").trim().toUpperCase();
+    if (!codigo) return jsonOut({ status: "error", message: "Código é obrigatório." });
+
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+    var values = sheet.getDataRange().getValues();
+    for (var i = 1; i < values.length; i++) {
+      var rowCode = String(values[i][0]).trim().toUpperCase();
+      if (rowCode !== codigo) continue;
+      sheet.deleteRow(i + 1);
+      return jsonOut({ status: "ok" });
+    }
+    return jsonOut({ status: "not_found", codigo: codigo });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function getOrCreateConfigSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName(CONFIG_TAB_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(CONFIG_TAB_NAME);
+    sheet.getRange(1, 1, 1, 2).setValues([["Chave", "Valor"]]);
+    sheet.getRange(2, 1, 1, 2).setValues([[TEMPLATE_KEY, DEFAULT_TEMPLATE]]);
+  }
+  return sheet;
+}
+
+function actionGetTemplate() {
+  var sheet = getOrCreateConfigSheet();
+  var values = sheet.getDataRange().getValues();
+  for (var i = 1; i < values.length; i++) {
+    if (String(values[i][0]).trim() === TEMPLATE_KEY) {
+      return jsonOut({ status: "ok", template: String(values[i][1] || DEFAULT_TEMPLATE) });
+    }
+  }
+  return jsonOut({ status: "ok", template: DEFAULT_TEMPLATE });
+}
+
+function actionSetTemplate(body) {
+  var template = String(body.template || "").trim();
+  if (!template) return jsonOut({ status: "error", message: "Template vazio." });
+  var sheet = getOrCreateConfigSheet();
+  var values = sheet.getDataRange().getValues();
+  for (var i = 1; i < values.length; i++) {
+    if (String(values[i][0]).trim() === TEMPLATE_KEY) {
+      sheet.getRange(i + 1, 2).setValue(template);
+      return jsonOut({ status: "ok" });
+    }
+  }
+  sheet.appendRow([TEMPLATE_KEY, template]);
+  return jsonOut({ status: "ok" });
+}
+
+/**
+ * Lista individual de convidados (planilha separada "1 ano Santiago - Lista
+ * de Convidados", primeira aba: colunas Lista/Nomes/Enviados/Confirmados).
+ */
+function actionListGuests() {
+  var ss = SpreadsheetApp.openById(REVIEW_SHEET_ID);
+  var sheet = ss.getSheets()[0];
+  var values = sheet.getDataRange().getValues();
+  var guests = [];
+  for (var i = 1; i < values.length; i++) {
+    var nome = String(values[i][1] || "").trim();
+    if (!nome) continue;
+    guests.push({
+      row: i + 1,
+      numero: values[i][0],
+      nome: nome,
+      confirmado: !!String(values[i][3] || "").trim()
+    });
+  }
+  return jsonOut({ status: "ok", guests: guests });
+}
+
+function actionToggleGuestConfirmed(body) {
+  var row = Number(body.row);
+  if (!row) return jsonOut({ status: "error", message: "linha inválida" });
+  var confirmed = !!body.confirmed;
+  var ss = SpreadsheetApp.openById(REVIEW_SHEET_ID);
+  var sheet = ss.getSheets()[0];
+  sheet.getRange(row, 4).setValue(confirmed ? "Sim" : "");
+  return jsonOut({ status: "ok" });
 }
 
 /**
