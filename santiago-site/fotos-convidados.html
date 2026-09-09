@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Santiago — Mandar Fotos</title>
+<style>
+  :root {
+    --cream: #fbf9f4; --cream2: #f2ede0; --tan-light: #f7dd99; --tan: #eaa200;
+    --brown: #eaa200; --blue: #2e86ab; --espresso: #332f28; --ink: #332f28;
+    --ink-soft: #83796a; --card: #ffffff; --line: #ece5d4; --shadow: rgba(40, 35, 25, 0.13);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--cream); }
+  body {
+    color: var(--ink); font-family: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; padding: 0 0 72px;
+    display: flex; flex-direction: column; align-items: center; position: relative;
+    background-image:
+      linear-gradient(180deg, var(--cream) 0, var(--cream) 110px, rgba(251,249,244,.65) 220px, rgba(251,249,244,0) 380px),
+      url("assets/bg.png");
+    background-repeat: no-repeat, no-repeat;
+    background-position: top center, top center;
+    background-size: 100% 380px, 122vw auto;
+  }
+  .topbar {
+    position: sticky; top: 0; z-index: 10; width: 100%; background: var(--brown); color: #fff;
+    text-align: center; padding: 13px 16px; font-size: 17px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase; font-variant-numeric: tabular-nums;
+  }
+  .topbar strong { font-weight: 700; }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    text-decoration: none; color: var(--brown); font-weight: 700;
+    font-size: 18px; margin: 4px 0 16px;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  .wrap { width: 100%; max-width: 560px; padding: 24px 20px 0; }
+  .page-kicker {
+    text-align: center; font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--blue); margin: 22px 0 8px;
+  }
+  .page-title {
+    font-family: "Fraunces", serif; font-weight: 640; font-size: clamp(26px, 7vw, 36px);
+    text-align: center; color: var(--ink); margin: 0 0 8px; text-wrap: balance;
+  }
+  .page-lede { text-align: center; color: var(--ink-soft); font-size: 16.5px; max-width: 36ch; margin: 0 auto 28px; }
+
+  .success-card {
+    display: none; background: var(--card); border: 1px solid var(--line); border-radius: 24px;
+    padding: 40px 28px; box-shadow: 0 16px 34px -20px var(--shadow); margin-bottom: 40px; text-align: center;
+  }
+  .success-card.is-visible { display: block; }
+  .success-card svg { color: var(--brown); margin-bottom: 12px; }
+  .success-title { font-family: "Fraunces", serif; font-weight: 640; font-size: 22px; color: var(--ink); margin: 0 0 8px; }
+  .success-lede { color: var(--ink-soft); font-size: 16.5px; margin: 0 0 24px; line-height: 1.5; }
+  .success-btn {
+    display: inline-block; text-decoration: none; border-radius: 999px; padding: 13px 28px;
+    background: var(--brown); color: #fff; font-family: "Fraunces", serif; font-weight: 600; font-size: 17px;
+    border: none; cursor: pointer; margin: 0 6px;
+  }
+  .success-btn.is-outline { background: none; color: var(--brown); border: 1.5px solid var(--brown); }
+
+  .photo-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 24px;
+    padding: 28px 24px 26px; box-shadow: 0 16px 34px -20px var(--shadow); margin-bottom: 40px;
+  }
+  .rsvp-field { margin-bottom: 6px; }
+  .rsvp-field label {
+    display: block; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 6px;
+  }
+  .rsvp-field input {
+    width: 100%; padding: 12px 14px; border-radius: 12px; border: 1.5px solid var(--line);
+    background: var(--cream2); font-family: "Work Sans", sans-serif; font-size: 17px; color: var(--ink);
+  }
+  .rsvp-field input:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
+
+  .photo-picker { display: flex; gap: 10px; margin: 18px 0 6px; }
+  .picker-btn {
+    flex: 1; border: 1.5px solid var(--line); background: var(--cream2); border-radius: 14px;
+    padding: 16px 10px; font-family: "Work Sans", sans-serif; font-size: 14.5px; font-weight: 600;
+    color: var(--ink); text-align: center; cursor: pointer; line-height: 1.3;
+  }
+  .picker-btn:active { background: var(--tan-light); }
+
+  .photo-counter { margin: 12px 2px 10px; font-size: 14.5px; color: var(--ink-soft); }
+  .photo-counter.is-warning { color: var(--tan); font-weight: 600; }
+
+  .photo-preview-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 6px;
+  }
+  .photo-thumb {
+    position: relative; aspect-ratio: 1; border-radius: 14px; overflow: hidden;
+    background: var(--cream2); border: 1px solid var(--line);
+  }
+  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-thumb.is-processing { display: flex; align-items: center; justify-content: center; }
+  .photo-thumb.is-processing::after {
+    content: "..."; color: var(--ink-soft); font-size: 20px; font-weight: 700;
+  }
+  .photo-thumb.is-error { border-color: var(--tan); }
+  .photo-thumb-remove {
+    position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%;
+    border: none; background: rgba(20,16,10,0.65); color: #fff; font-size: 13px; line-height: 1;
+    cursor: pointer;
+  }
+  .photo-thumb-error-msg {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    text-align: center; font-size: 10.5px; color: var(--tan); padding: 6px; background: var(--cream2);
+  }
+
+  .rsvp-submit {
+    width: 100%; border: none; border-radius: 999px; padding: 14px; background: var(--brown);
+    color: #fff; font-family: "Fraunces", serif; font-weight: 600; font-size: 18px; cursor: pointer;
+    margin-top: 14px;
+  }
+  .rsvp-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+  .rsvp-status { margin: 14px 2px 0; font-size: 15.5px; color: var(--ink); text-align: center; min-height: 18px; }
+  .rsvp-status.is-error { color: var(--tan); font-weight: 600; }
+
+  footer { text-align: center; font-size: 13.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,380..700;1,9..144,380..700&family=Work+Sans:wght@400;500;600&display=swap">
+</head>
+<body>
+
+<div class="topbar" id="topbar">carregando…</div>
+
+<div class="wrap">
+  <a class="back-link" href="index.html">← Início</a>
+  <p class="page-kicker">compartilhe</p>
+  <h1 class="page-title">Mande suas fotos da festa</h1>
+  <p class="page-lede">Tirou um clique bacana? Manda pra gente aqui — cai direto no álbum do Santiago.</p>
+
+  <div class="success-card" id="successCard">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 12.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    <p class="success-title" id="successTitle">Fotos enviadas!</p>
+    <p class="success-lede">Obrigado por compartilhar — o Uriel vai adorar ver. 💛</p>
+    <button class="success-btn" type="button" id="sendMoreBtn">Enviar mais fotos</button>
+    <a class="success-btn is-outline" href="index.html">Voltar para o início</a>
+  </div>
+
+  <div class="photo-card" id="photoCard">
+    <div class="rsvp-field">
+      <label for="guestName">Seu nome</label>
+      <input id="guestName" type="text" placeholder="ex: Tia Marcela" autocomplete="off">
+    </div>
+
+    <div class="photo-picker">
+      <button class="picker-btn" type="button" id="btnCamera">📷 Tirar foto agora</button>
+      <button class="picker-btn" type="button" id="btnGallery">🖼️ Escolher da galeria</button>
+    </div>
+    <input type="file" id="inputCamera" accept="image/*" capture="environment" hidden>
+    <input type="file" id="inputGallery" accept="image/*" multiple hidden>
+
+    <p class="photo-counter" id="photoCounter">Nenhuma foto selecionada ainda (máx. 8 por envio)</p>
+    <div class="photo-preview-grid" id="previewGrid"></div>
+
+    <button class="rsvp-submit" type="button" id="sendBtn" disabled>Enviar fotos</button>
+    <p class="rsvp-status" id="photoStatus"></p>
+  </div>
+
+  <footer>Vila Encantada 1 · Rio de Janeiro</footer>
+</div>
+
+<script>
+  (function () {
+    var target = new Date("2026-11-28T12:00:00-03:00").getTime();
+    var bar = document.getElementById("topbar");
+    function tick() {
+      var diff = target - Date.now();
+      if (diff <= 0) { bar.textContent = "É hoje! ✈️"; return; }
+      var d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000),
+          m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
+      bar.innerHTML = "Faltam <strong>" + d + "</strong>d · <strong>" + String(h).padStart(2,"0") + "</strong>h · <strong>" + String(m).padStart(2,"0") + "</strong>min · <strong>" + String(s).padStart(2,"0") + "</strong>s";
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
+
+<script>
+  (function () {
+    var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyDLdMGnUPTmvlOtdb7H6JFHaSLOk19CwdW241FO47i8sewJ4s7erQ_hL9tKywwTvw/exec";
+
+    var MAX_PHOTOS = 8;
+    var MAX_LONG_EDGE = 1600;
+    var TARGET_MAX_BYTES = 1.2 * 1024 * 1024;
+    var RAW_FALLBACK_MAX = 6 * 1024 * 1024;
+
+    var queue = []; // { id, status: 'processing'|'ready'|'ready-raw'|'error', base64, mimeType, filename, previewUrl, errorMsg }
+
+    var previewGrid = document.getElementById("previewGrid");
+    var counter = document.getElementById("photoCounter");
+    var sendBtn = document.getElementById("sendBtn");
+    var status = document.getElementById("photoStatus");
+    var guestName = document.getElementById("guestName");
+
+    function uid() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+
+    function readyCount() {
+      return queue.filter(function (q) { return q.status === "ready" || q.status === "ready-raw"; }).length;
+    }
+
+    function renderPreview() {
+      previewGrid.innerHTML = "";
+      queue.forEach(function (item) {
+        var thumb = document.createElement("div");
+        thumb.className = "photo-thumb" + (item.status === "processing" ? " is-processing" : "") + (item.status === "error" ? " is-error" : "");
+
+        if (item.status === "error") {
+          var errBox = document.createElement("div");
+          errBox.className = "photo-thumb-error-msg";
+          errBox.textContent = item.errorMsg || "Não foi possível processar essa foto.";
+          thumb.appendChild(errBox);
+        } else if (item.previewUrl) {
+          var img = document.createElement("img");
+          img.src = item.previewUrl;
+          img.alt = "Prévia";
+          thumb.appendChild(img);
+        }
+
+        var removeBtn = document.createElement("button");
+        removeBtn.type = "button";
+        removeBtn.className = "photo-thumb-remove";
+        removeBtn.setAttribute("aria-label", "Remover foto");
+        removeBtn.textContent = "✕";
+        removeBtn.addEventListener("click", function () {
+          queue = queue.filter(function (q) { return q.id !== item.id; });
+          renderPreview();
+          updateCounter();
+          updateSendButton();
+        });
+        thumb.appendChild(removeBtn);
+
+        previewGrid.appendChild(thumb);
+      });
+    }
+
+    function updateCounter() {
+      var n = queue.length;
+      if (n === 0) {
+        counter.textContent = "Nenhuma foto selecionada ainda (máx. " + MAX_PHOTOS + " por envio)";
+        counter.classList.remove("is-warning");
+      } else {
+        counter.textContent = n + " de " + MAX_PHOTOS + " fotos selecionadas";
+        counter.classList.toggle("is-warning", n >= MAX_PHOTOS);
+      }
+    }
+
+    function updateSendButton() {
+      sendBtn.disabled = readyCount() === 0;
+    }
+
+    function loadBitmapOrImage(file) {
+      if (window.createImageBitmap) {
+        return createImageBitmap(file).catch(function () { return loadViaImg(file); });
+      }
+      return loadViaImg(file);
+    }
+
+    function loadViaImg(file) {
+      return new Promise(function (resolve, reject) {
+        var url = URL.createObjectURL(file);
+        var img = new Image();
+        img.onload = function () { resolve(img); };
+        img.onerror = function () { URL.revokeObjectURL(url); reject(new Error("não decodificou")); };
+        img.src = url;
+      });
+    }
+
+    function drawScaled(bitmap) {
+      var w = bitmap.width, h = bitmap.height;
+      var scale = Math.min(1, MAX_LONG_EDGE / Math.max(w, h));
+      var canvas = document.createElement("canvas");
+      canvas.width = Math.round(w * scale);
+      canvas.height = Math.round(h * scale);
+      var ctx = canvas.getContext("2d");
+      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+      return canvas;
+    }
+
+    function readAsBase64(file) {
+      return new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function () { resolve(reader.result.split(",")[1]); };
+        reader.onerror = function () { reject(new Error("falha ao ler arquivo")); };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function processFile(file) {
+      var item = { id: uid(), status: "processing", filename: file.name || "foto.jpg" };
+      queue.push(item);
+      renderPreview();
+      updateCounter();
+
+      loadBitmapOrImage(file)
+        .then(function (bitmap) {
+          var canvas = drawScaled(bitmap);
+          var quality = 0.72;
+          var dataUrl = canvas.toDataURL("image/jpeg", quality);
+          while (dataUrl.length * 0.75 > TARGET_MAX_BYTES && quality > 0.4) {
+            quality -= 0.1;
+            dataUrl = canvas.toDataURL("image/jpeg", quality);
+          }
+          item.base64 = dataUrl.split(",")[1];
+          item.mimeType = "image/jpeg";
+          item.previewUrl = dataUrl;
+          item.status = "ready";
+        })
+        .catch(function () {
+          if (file.size <= RAW_FALLBACK_MAX) {
+            return readAsBase64(file).then(function (b64) {
+              item.base64 = b64;
+              item.mimeType = file.type || "application/octet-stream";
+              item.previewUrl = URL.createObjectURL(file);
+              item.status = "ready-raw";
+            }).catch(function () {
+              item.status = "error";
+              item.errorMsg = "Não foi possível processar essa foto.";
+            });
+          }
+          item.status = "error";
+          item.errorMsg = "Foto muito grande e em formato não suportado.";
+        })
+        .then(function () {
+          renderPreview();
+          updateSendButton();
+        });
+    }
+
+    function addFiles(fileList) {
+      var current = queue.length;
+      var slots = MAX_PHOTOS - current;
+      var files = Array.prototype.slice.call(fileList, 0, Math.max(0, slots));
+      files.forEach(processFile);
+      if (fileList.length > slots) {
+        counter.classList.add("is-warning");
+      }
+    }
+
+    document.getElementById("btnCamera").addEventListener("click", function () {
+      document.getElementById("inputCamera").click();
+    });
+    document.getElementById("btnGallery").addEventListener("click", function () {
+      document.getElementById("inputGallery").click();
+    });
+    document.getElementById("inputCamera").addEventListener("change", function (e) {
+      addFiles(e.target.files);
+      e.target.value = "";
+    });
+    document.getElementById("inputGallery").addEventListener("change", function (e) {
+      addFiles(e.target.files);
+      e.target.value = "";
+    });
+
+    function showStatus(msg, isError) {
+      status.textContent = msg;
+      status.classList.toggle("is-error", !!isError);
+    }
+
+    function resetForm() {
+      queue = [];
+      guestName.value = "";
+      renderPreview();
+      updateCounter();
+      updateSendButton();
+      showStatus("", false);
+      document.getElementById("photoCard").style.display = "";
+      document.getElementById("successCard").classList.remove("is-visible");
+    }
+    document.getElementById("sendMoreBtn").addEventListener("click", resetForm);
+
+    // modo de teste: só ativo em localhost/IP local, nunca no site publicado
+    var MOCK = /^(localhost|127\.0\.0\.1|192\.168\.|10\.)/.test(location.hostname) || location.search.indexOf("mock=") > -1;
+
+    document.getElementById("sendBtn").addEventListener("click", function () {
+      var name = guestName.value.trim();
+      var ready = queue.filter(function (q) { return q.status === "ready" || q.status === "ready-raw"; });
+      if (!name) { showStatus("Escreve seu nome antes de enviar.", true); return; }
+      if (!ready.length) { showStatus("Selecione pelo menos uma foto.", true); return; }
+
+      sendBtn.disabled = true;
+      sendBtn.textContent = "Enviando...";
+      showStatus("", false);
+
+      function onSuccess() {
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Enviar fotos";
+        document.getElementById("photoCard").style.display = "none";
+        document.getElementById("successCard").classList.add("is-visible");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      function onFailure() {
+        sendBtn.disabled = false;
+        sendBtn.textContent = "Enviar fotos";
+        showStatus("Não conseguimos enviar agora — as fotos continuam selecionadas, é só tentar de novo.", true);
+      }
+
+      if (MOCK) {
+        setTimeout(function () {
+          if (location.search.indexOf("mock=error") > -1) onFailure(); else onSuccess();
+        }, 900);
+        return;
+      }
+
+      fetch(SCRIPT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          guestName: name,
+          photos: ready.map(function (q) { return { filename: q.filename, mimeType: q.mimeType, base64: q.base64 }; })
+        })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (data.status === "ok") onSuccess(); else onFailure();
+        })
+        .catch(onFailure);
+    });
+
+    updateCounter();
+    updateSendButton();
+  })();
+</script>
+</body>
+</html>
