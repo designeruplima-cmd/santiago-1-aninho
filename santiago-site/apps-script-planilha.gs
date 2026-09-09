@@ -132,6 +132,29 @@ function logConfirmacaoParaRevisao(code, familyName, coming, notComing, msgParen
 }
 
 /**
+ * Rode esta função MANUALMENTE aqui no editor (não vem do site) — selecione
+ * "testarAcessoPlanilhaRevisao" na listinha ao lado do botão Executar (▶) lá
+ * em cima e clique em Executar. Se aparecer uma tela do Google pedindo
+ * permissão, aceite (clique em Avançado → Acessar [nome do projeto] (não
+ * seguro) → Permitir, do mesmo jeito que já fez antes). Se der certo, confira
+ * se surgiu uma linha "TESTE-ACESSO" na aba "Confirmações a revisar" da
+ * planilha de convidados. Se der erro, o próprio Apps Script mostra a
+ * mensagem exata do problema numa caixinha na tela.
+ */
+function testarAcessoPlanilhaRevisao() {
+  var reviewSpreadsheet = SpreadsheetApp.openById(REVIEW_SHEET_ID);
+  var reviewSheet = reviewSpreadsheet.getSheetByName(REVIEW_TAB_NAME);
+  if (!reviewSheet) {
+    reviewSheet = reviewSpreadsheet.insertSheet(REVIEW_TAB_NAME);
+    reviewSheet.getRange(1, 1, 1, 6).setValues([[
+      "Data/hora", "Código da família", "Nome da família",
+      "Confirmaram presença", "Não vão", "Recados"
+    ]]);
+  }
+  reviewSheet.appendRow([new Date(), "TESTE-ACESSO", "Teste de acesso", "ninguém", "ninguém", ""]);
+}
+
+/**
  * Rode esta função uma única vez (antes de publicar), pra escrever os
  * títulos das colunas novas na primeira linha da planilha.
  */
