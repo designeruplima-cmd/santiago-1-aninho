@@ -28,7 +28,7 @@
     background-image: url("assets/bg.png");
     background-size: 100vw auto;
     background-position: top center;
-    background-repeat: repeat-y;
+    background-repeat: no-repeat;
   }
 
   .topbar {
@@ -96,6 +96,28 @@
     margin-bottom: 8px;
   }
   .how-to li:last-child { margin-bottom: 0; }
+
+  .success-card {
+    display: none;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    padding: 40px 28px;
+    box-shadow: 0 16px 34px -20px var(--shadow);
+    margin-bottom: 40px;
+    text-align: center;
+  }
+  .success-card.is-visible { display: block; }
+  .success-card svg { color: var(--brown); margin-bottom: 12px; }
+  .success-title {
+    font-family: "Fraunces", serif; font-weight: 640; font-size: 22px;
+    color: var(--ink); margin: 0 0 8px;
+  }
+  .success-lede { color: var(--ink-soft); font-size: 14.5px; margin: 0 0 24px; line-height: 1.5; }
+  .success-btn {
+    display: inline-block; text-decoration: none; border-radius: 999px; padding: 13px 28px;
+    background: var(--brown); color: #fff; font-family: "Fraunces", serif; font-weight: 600; font-size: 15px;
+  }
 
   .rsvp-card {
     background: var(--card);
@@ -268,7 +290,7 @@
   <h1 class="page-title">Confirme sua presença</h1>
   <p class="page-lede">Preencha o código da sua família, marque quem vem e complete o nome de cada um.</p>
 
-  <div class="how-to">
+  <div class="how-to" id="howToCard">
     <p class="how-to-title">Como confirmar, passo a passo</p>
     <ol>
       <li>Copie o código que você recebeu dos pais no WhatsApp</li>
@@ -278,7 +300,14 @@
     </ol>
   </div>
 
-  <div class="rsvp-card">
+  <div class="success-card" id="successCard">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 12.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+    <p class="success-title">Presença confirmada!</p>
+    <p class="success-lede">Já anotamos tudo certinho. Nos vemos na festa do Santiago! 💛</p>
+    <a class="success-btn" href="index.html">Voltar para o início</a>
+  </div>
+
+  <div class="rsvp-card" id="rsvpCard">
     <div class="rsvp-field">
       <label for="familyCode">Código da família</label>
       <input id="familyCode" type="text" placeholder="ex: NOME01" autocomplete="off">
@@ -493,7 +522,10 @@
           confirmBtn.disabled = false;
           confirmBtn.textContent = "Confirmar presença";
           if (data.status === "ok") {
-            status.textContent = "Presença confirmada! Já registramos na nossa lista, obrigado 💛";
+            document.getElementById("howToCard").style.display = "none";
+            document.getElementById("rsvpCard").style.display = "none";
+            document.getElementById("successCard").classList.add("is-visible");
+            window.scrollTo({ top: 0, behavior: "smooth" });
           } else if (data.status === "already_confirmed") {
             status.textContent = "Esse código já confirmou presença antes. Se precisar mudar algo, fale direto com o Uriel.";
             status.classList.add("is-error");
