@@ -1,0 +1,16 @@
+{
+  "name": "Painel Santiago",
+  "short_name": "Painel Santi",
+  "description": "Painel interno para gerenciar famílias, códigos e confirmações da festa do Santiago.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fbf9f4",
+  "theme_color": "#eaa200",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
