@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Santiago — Minha História</title>
 <style>
   :root {
@@ -11,8 +16,12 @@
     color: var(--ink); font-family: "Work Sans", ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased; padding: 0 0 72px;
     display: flex; flex-direction: column; align-items: center; position: relative;
-    background-image: url("assets/bg.png");
-    background-size: 100vw auto; background-position: top center; background-repeat: no-repeat;
+    background-image:
+      linear-gradient(180deg, var(--cream) 0, var(--cream) 110px, rgba(251,249,244,.65) 220px, rgba(251,249,244,0) 380px),
+      url("assets/bg.png");
+    background-repeat: no-repeat, no-repeat;
+    background-position: top center, top center;
+    background-size: 100% 380px, 122vw auto;
   }
   .topbar {
     position: sticky; top: 0; z-index: 10; width: 100%; background: var(--brown); color: #fff;
@@ -65,6 +74,8 @@
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,380..700;1,9..144,380..700&family=Work+Sans:wght@400;500;600&display=swap">
+</head>
+<body>
 
 <div class="topbar" id="topbar">carregando…</div>
 
@@ -110,3 +121,5 @@
     setInterval(tick, 1000);
   })();
 </script>
+</body>
+</html>
