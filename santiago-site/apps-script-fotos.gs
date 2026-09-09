@@ -25,7 +25,8 @@
 
 var FOLDER_ID = "1bsZzPrl3anN6yuEFzCsX2F0QKXb1wJCB";
 var MAX_PHOTOS_PER_REQUEST = 10; // limite defensivo no servidor (o site já limita a 8)
-var MAX_PHOTO_BYTES = 15 * 1024 * 1024; // ~15MB por arquivo já decodificado
+var MAX_PHOTO_BYTES = 15 * 1024 * 1024; // ~15MB por foto já decodificada
+var MAX_VIDEO_BYTES = 25 * 1024 * 1024; // ~25MB por vídeo já decodificado (o site já limita a 20MB no envio)
 
 function doGet(e) {
   return ContentService.createTextOutput("OK — endpoint de fotos do Santiago está ativo.");
@@ -39,7 +40,7 @@ function doPost(e) {
     var photos = Array.isArray(data.photos) ? data.photos.slice(0, MAX_PHOTOS_PER_REQUEST) : [];
 
     if (!photos.length) {
-      return jsonOut({ status: "error", message: "Nenhuma foto recebida." });
+      return jsonOut({ status: "error", message: "Nenhum arquivo recebido." });
     }
 
     var folder = DriveApp.getFolderById(FOLDER_ID);
@@ -49,11 +50,15 @@ function doPost(e) {
     for (var i = 0; i < photos.length; i++) {
       try {
         var p = photos[i] || {};
-        if (!p.base64) throw new Error("sem dado de imagem");
+        if (!p.base64) throw new Error("sem dado de imagem/vídeo");
         var mime = p.mimeType || "image/jpeg";
-        var ext = mime.indexOf("png") > -1 ? "png" : (mime.indexOf("heic") > -1 ? "heic" : "jpg");
+        var isVideo = mime.indexOf("video/") === 0;
+        var ext = isVideo
+          ? (mime.indexOf("quicktime") > -1 ? "mov" : "mp4")
+          : (mime.indexOf("png") > -1 ? "png" : (mime.indexOf("heic") > -1 ? "heic" : "jpg"));
         var bytes = Utilities.base64Decode(p.base64);
-        if (bytes.length > MAX_PHOTO_BYTES) throw new Error("arquivo muito grande");
+        var maxBytes = isVideo ? MAX_VIDEO_BYTES : MAX_PHOTO_BYTES;
+        if (bytes.length > maxBytes) throw new Error("arquivo muito grande");
 
         var filename = timestamp + "_" + safeName + "_" + (i + 1) + "." + ext;
         var blob = Utilities.newBlob(bytes, mime, filename);
