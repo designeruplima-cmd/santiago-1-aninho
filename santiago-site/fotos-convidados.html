@@ -55,10 +55,11 @@
   .success-card svg { color: var(--brown); margin-bottom: 12px; }
   .success-title { font-family: "Fraunces", serif; font-weight: 640; font-size: 22px; color: var(--ink); margin: 0 0 8px; }
   .success-lede { color: var(--ink-soft); font-size: 16.5px; margin: 0 0 24px; line-height: 1.5; }
+  .success-actions { display: flex; flex-direction: column; gap: 12px; }
   .success-btn {
-    display: inline-block; text-decoration: none; border-radius: 999px; padding: 13px 28px;
-    background: var(--brown); color: #fff; font-family: "Fraunces", serif; font-weight: 600; font-size: 17px;
-    border: none; cursor: pointer; margin: 0 6px;
+    display: block; width: 100%; box-sizing: border-box; text-decoration: none; border-radius: 999px;
+    padding: 13px 28px; background: var(--brown); color: #fff; font-family: "Fraunces", serif;
+    font-weight: 600; font-size: 17px; border: none; cursor: pointer; text-align: center;
   }
   .success-btn.is-outline { background: none; color: var(--brown); border: 1.5px solid var(--brown); }
 
@@ -138,9 +139,11 @@
   <div class="success-card" id="successCard">
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 12.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
     <p class="success-title" id="successTitle">Fotos enviadas!</p>
-    <p class="success-lede">Obrigado por compartilhar — o Uriel vai adorar ver. 💛</p>
-    <button class="success-btn" type="button" id="sendMoreBtn">Enviar mais fotos</button>
-    <a class="success-btn is-outline" href="index.html">Voltar para o início</a>
+    <p class="success-lede">Obrigado por compartilhar — o Santiago vai adorar ver. 💛</p>
+    <div class="success-actions">
+      <button class="success-btn" type="button" id="sendMoreBtn">Enviar mais fotos</button>
+      <a class="success-btn is-outline" href="index.html">Voltar para o início</a>
+    </div>
   </div>
 
   <div class="photo-card" id="photoCard">
