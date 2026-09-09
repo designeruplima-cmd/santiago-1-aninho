@@ -15,6 +15,51 @@ var TEST_CODES = ["ANATESTE", "URIELTESTE"];
 var REVIEW_SHEET_ID = "18FToLa0bzzg65OQ-BKP-bvhnaHV8QrtbxW0A2CMt6tE";
 var REVIEW_TAB_NAME = "Confirmações a revisar";
 
+/**
+ * Busca a família pelo código (usado pela tela de confirmar presença pra
+ * mostrar os nomes de quem mora na casa antes de confirmar).
+ */
+function doGet(e) {
+  var code = String((e && e.parameter && e.parameter.code) || "").trim().toUpperCase();
+  if (!code) {
+    return ContentService.createTextOutput("OK — endpoint da lista de famílias do Santiago está ativo.");
+  }
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  var values = sheet.getDataRange().getValues();
+  for (var i = 1; i < values.length; i++) {
+    var rowCode = String(values[i][0]).trim().toUpperCase();
+    if (rowCode !== code) continue;
+
+    var names = splitNames(values[i][3]); // coluna D - Nomes individuais da casa
+    var alreadyConfirmed = !!String(values[i][6] || "").trim(); // coluna G - Confirmado
+
+    return ContentService.createTextOutput(JSON.stringify({
+      found: true, names: names, alreadyConfirmed: alreadyConfirmed
+    })).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  return ContentService.createTextOutput(JSON.stringify({ found: false }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * Separa "Norma, Aloma e Alanna" em ["Norma", "Aloma", "Alanna"] — troca o
+ * último " e " por vírgula antes de dividir, pra funcionar com qualquer
+ * quantidade de nomes na casa.
+ */
+function splitNames(raw) {
+  var s = String(raw || "").trim();
+  if (!s) return [];
+  var lastE = s.lastIndexOf(" e ");
+  if (lastE > -1) {
+    s = s.substring(0, lastE) + ", " + s.substring(lastE + 3);
+  }
+  return s.split(",")
+    .map(function (n) { return n.trim(); })
+    .filter(function (n) { return n; });
+}
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
