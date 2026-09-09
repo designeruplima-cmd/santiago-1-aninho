@@ -72,6 +72,31 @@
     margin: 0 auto 28px;
   }
 
+  .how-to {
+    background: var(--cream2);
+    border-radius: 18px;
+    padding: 20px 22px;
+    margin-bottom: 20px;
+  }
+  .how-to-title {
+    font-family: "Fraunces", serif;
+    font-weight: 620;
+    font-size: 16px;
+    color: var(--ink);
+    margin: 0 0 10px;
+  }
+  .how-to ol {
+    margin: 0;
+    padding-left: 22px;
+    color: var(--ink);
+  }
+  .how-to li {
+    font-size: 15.5px;
+    line-height: 1.65;
+    margin-bottom: 8px;
+  }
+  .how-to li:last-child { margin-bottom: 0; }
+
   .rsvp-card {
     background: var(--card);
     border: 1px solid var(--line);
@@ -171,6 +196,13 @@
     color: var(--ink-soft);
   }
   .names-hint.not-found { color: var(--tan); font-weight: 600; }
+
+  .code-warning {
+    margin: 10px 2px 0;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
   .reveal { display: none; }
   .reveal.is-visible { display: block; }
 
@@ -236,11 +268,22 @@
   <h1 class="page-title">Confirme sua presença</h1>
   <p class="page-lede">Preencha o código da sua família, marque quem vem e complete o nome de cada um.</p>
 
+  <div class="how-to">
+    <p class="how-to-title">Como confirmar, passo a passo</p>
+    <ol>
+      <li>Copie o código que você recebeu dos pais no WhatsApp</li>
+      <li>Cole o código no campo abaixo</li>
+      <li>Marque quem da sua casa vai à festa</li>
+      <li>Aperte o botão "Confirmar presença"</li>
+    </ol>
+  </div>
+
   <div class="rsvp-card">
     <div class="rsvp-field">
       <label for="familyCode">Código da família</label>
       <input id="familyCode" type="text" placeholder="ex: NOME01" autocomplete="off">
     </div>
+    <p class="code-warning">Atenção: o código só pode ser usado uma vez. Depois que a sua casa confirmar, ele não funciona de novo.</p>
     <p class="names-hint" id="namesHint">Digite o código acima para ver quem mora na sua casa.</p>
 
     <div class="reveal" id="revealSection">
