@@ -105,6 +105,49 @@
     margin: 0 auto;
   }
 
+  /* ---------- photo carousel ---------- */
+  .photo-carousel-title {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin: 8px 0 12px;
+  }
+  .photo-carousel {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 4px 4px 14px;
+    margin: 0 0 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .photo-carousel::-webkit-scrollbar { display: none; }
+  .photo-carousel .frame {
+    flex: 0 0 auto;
+    scroll-snap-align: center;
+    width: 66%;
+    max-width: 260px;
+    aspect-ratio: 4 / 5;
+    border-radius: 20px;
+    background: var(--cream2);
+    border: 1px solid var(--line);
+    box-shadow: 0 14px 30px -20px var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tan);
+    overflow: hidden;
+  }
+  .photo-carousel .frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
   .lede {
     position: relative;
     text-align: center;
@@ -156,6 +199,10 @@
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/><path d="M8.5 14.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
       <span>Minha história</span>
     </a>
+    <a class="nav-tile" href="galeria.html">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="10" r="1.6" stroke="currentColor" stroke-width="1.8"/><path d="M3 15.5l5-4 4.5 4L16 12l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+      <span>Galeria de fotos</span>
+    </a>
     <a class="nav-tile" href="como-chegar.html">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s7-6.1 7-11.5A7 7 0 1 0 5 9.5C5 14.9 12 21 12 21Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9.5" r="2.3" stroke="currentColor" stroke-width="1.8"/></svg>
       <span>Como chegar</span>
@@ -164,10 +211,74 @@
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M8 12.5l2.5 2.5L16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
       <span>Confirmar presença</span>
     </a>
+    <a class="nav-tile" href="fotos-convidados.html">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.4" stroke="currentColor" stroke-width="1.8"/></svg>
+      <span>Mandar fotos</span>
+    </a>
     <a class="nav-tile" href="presente.html">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="9" width="18" height="11" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M12 9v11M7.5 9a2.5 2.5 0 010-5C10 4 12 9 12 9c0 0 2-5 4.5-5a2.5 2.5 0 010 5" stroke="currentColor" stroke-width="1.8"/></svg>
       <span>Sugestão de presente</span>
     </a>
+  </div>
+
+  <p class="photo-carousel-title">Fotinhos do Santiago</p>
+  <div class="photo-carousel">
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-01.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-02.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-03.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-04.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-05.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-06.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-07.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-08.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-09.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-10.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-11.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-12.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-13.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-14.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-15.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-16.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-17.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-18.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-19.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-20.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-21.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-22.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-23.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-24.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-25.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-26.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-27.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-28.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-29.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-30.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-31.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-32.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-33.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-34.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-35.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-36.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-37.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-38.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-39.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-40.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-41.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-42.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-43.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-44.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-45.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-46.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-47.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-48.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-49.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-50.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-51.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-52.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-53.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-54.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-55.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-56.jpg" alt="Santiago"></div>
   </div>
 
   <footer>Vila Encantada 1 · Rio de Janeiro</footer>
