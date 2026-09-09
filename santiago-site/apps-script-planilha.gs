@@ -6,6 +6,10 @@
  * essa função) — ela escreve os títulos das colunas novas (H, I, J, K) sozinha.
  */
 
+// Códigos de teste (aquecimento): confirmam quantas vezes for preciso, nunca travam
+// como "já confirmado". Usados só pelo próprio Uriel/família pra testar o fluxo.
+var TEST_CODES = ["ANATESTE", "URIELTESTE"];
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
@@ -23,8 +27,9 @@ function doPost(e) {
       var rowCode = String(values[i][0]).trim().toUpperCase();
       if (rowCode !== code) continue;
 
+      var isTestCode = TEST_CODES.indexOf(rowCode) > -1;
       var jaConfirmado = String(values[i][6] || "").trim(); // coluna G = Confirmado
-      if (jaConfirmado) {
+      if (jaConfirmado && !isTestCode) {
         return ContentService.createTextOutput(JSON.stringify({ status: "already_confirmed" }))
           .setMimeType(ContentService.MimeType.JSON);
       }
