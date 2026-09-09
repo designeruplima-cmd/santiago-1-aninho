@@ -66,9 +66,11 @@
   }
   .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
   .gallery .frame {
-    aspect-ratio: 1; border-radius: 18px; background: color-mix(in srgb, var(--tan-light) 45%, var(--card));
-    border: 1.5px dashed var(--tan); display: flex; align-items: center; justify-content: center; color: var(--tan);
+    aspect-ratio: 1; border-radius: 18px; background: var(--cream2);
+    border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; color: var(--tan);
+    overflow: hidden;
   }
+  .gallery .frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
   footer { text-align: center; font-size: 13.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
 </style>
@@ -81,26 +83,26 @@
 
 <div class="wrap">
   <a class="back-link" href="index.html">← Início</a>
-  <p class="page-kicker">nossa historinha</p>
+  <p class="page-kicker">minha historinha</p>
   <h1 class="page-title">Minha história</h1>
-  <p class="page-lede">Um pouquinho sobre o nosso pequeno brincalhão de 1 aninho.</p>
+  <p class="page-lede">Um pouquinho sobre a minha vida nesse primeiro aninho, contada por mim mesmo.</p>
 
   <div class="story-card">
     <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/><path d="M8.5 14.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
-    <p>Numa semana a gente decide que quer um bebê. Três semanas depois vem o positivo: o Santiago já está a caminho, bem mais rápido do que a gente espera. A gravidez é agitada do início ao fim, porque a mamãe não consegue ficar parada, e o bebê parece aprender isso ainda lá dentro. Na hora do parto ele demora pra decidir que está pronto pra sair, mas quando chega, chega com muita saúde: dia 17 de novembro de 2025, pesando 3kg e 300g.</p>
-    <p>Não é um bebê chorão. Desde cedo é sorridente, esperto, e vai passando por cada fase do desenvolvimento antes do esperado. Adora barulho, música e dançar, e vive aprontando as gracinhas dele. Come super bem desde que começa a experimentar comida, e adora transformar a água do copo numa bagunça só, fazendo bolinha com o que é pra ser só de beber.</p>
-    <p>Não tem medo nem de água gelada: já é fã de aventura, trilha, cachoeira, praia e de qualquer bicho que apareça pela frente, sempre com aquela curiosidade só dele. Adora tomar banho e aprontar com o papai, e adora cantar e dançar pela casa com a mamãe. É um bebê super carinhoso, gosta de um bom chameguinho, e já acorda sorrindo, gargalhando, brincando e conversando bastante. E claro, adora a bagunça de brincar com os primos e a companhia dos avós.</p>
+    <p>Oi, eu sou o Santiago! Deixa eu contar como tudo começou: meus pais decidiram que queriam um bebê, e três semanas depois já veio o positivo — eu vim rapidinho, bem mais rápido do que os dois esperavam. A gravidez inteira foi agitada, porque minha mãe não conseguia ficar parada nem um minuto, e acho que aprendi isso ainda lá dentro da barriga. Na hora de nascer, eu demorei pra decidir que estava pronto pra sair, mas quando cheguei, cheguei com muita saúde: dia 17 de novembro de 2025, pesando 3kg e 300g.</p>
+    <p>Ninguém me chama de chorão. Desde cedo sou sorridente, esperto, e vou passando por cada fase antes do esperado. Curto barulho, música e dançar, e vivo aprontando as minhas gracinhas. Como super bem desde que comecei a experimentar comida, e adoro transformar a água do meu copo numa bagunça só, fazendo bolinha com o que era pra ser só de beber.</p>
+    <p>Não tenho medo nem de água gelada: já sou fã de aventura, trilha, cachoeira, praia e de qualquer bicho que aparecer na frente, sempre com muita curiosidade. Gosto de tomar banho e aprontar com o papai, e canto e danço pela casa com a mamãe. Sou super carinhoso, gosto de um bom chameguinho, e já acordo sorrindo, gargalhando, brincando e conversando bastante. E claro, curto a bagunça de brincar com os primos e a companhia dos avós.</p>
   </div>
 
   <p class="section-kicker">momentos</p>
   <h2 class="section-title">Fotinhos do Santiago</h2>
   <div class="gallery">
-    <div class="frame"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M8 6l1.2-2h5.6L16 6" stroke="currentColor" stroke-width="1.6"/></svg></div>
-    <div class="frame"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M8 6l1.2-2h5.6L16 6" stroke="currentColor" stroke-width="1.6"/></svg></div>
-    <div class="frame"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M8 6l1.2-2h5.6L16 6" stroke="currentColor" stroke-width="1.6"/></svg></div>
-    <div class="frame"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M8 6l1.2-2h5.6L16 6" stroke="currentColor" stroke-width="1.6"/></svg></div>
-    <div class="frame"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M8 6l1.2-2h5.6L16 6" stroke="currentColor" stroke-width="1.6"/></svg></div>
-    <div class="frame"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="6" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="1.6"/><path d="M8 6l1.2-2h5.6L16 6" stroke="currentColor" stroke-width="1.6"/></svg></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-03.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-12.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-21.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-30.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-39.jpg" alt="Santiago"></div>
+    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-48.jpg" alt="Santiago"></div>
   </div>
 
   <footer>Vila Encantada 1 · Rio de Janeiro</footer>
