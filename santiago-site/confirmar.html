@@ -282,53 +282,14 @@
     setInterval(tick, 1000);
   })();
 
-  // ---- lookup de família por código, vindo da planilha "Santi - Lista de Famílias" ----
+  // ---- lookup de família por código, direto na planilha (ao vivo, via Apps Script) ----
   (function () {
-    var FAMILIES = {
-      // códigos de teste, não usar pra confirmar de verdade
-      "NOME01": ["Fulano", "Fulana"],
-      "NOME02": ["Cicero"],
+    var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbza0-DjB26jEMIjpLimp9ZeA5c9ss0vKyT7QrALZ4DdH_hpcmuJTPVMKzVj6OD1NgkR/exec"; // cole aqui a URL do Apps Script quando publicar
 
-      "NORMA01": ["Norma", "Aloma", "Alanna"],
-      "RAUL02": ["Raulino"],
-      "PAULA03": ["Paula", "Lenivaldo", "Maria Clara", "Caio"],
-      "JOSEANE04": ["Joseane", "Claudio", "Bratriz", "Leticia"],
-      "AMANDINHA5": ["Amanda"],
-      "DANIELE6": ["Daniele", "Nildete (Deta)", "Edimilson", "Ruberlandia"],
-      "NELMA7": ["Nelma", "Paulo Robson", "Maria Julia"],
-      "TANIA8": ["Tanie", "Dário"],
-      "MAURA": ["Maura", "Micka", "Maria Flor"],
-      "CAROL": ["Carol", "Pedro", "Elivania"],
-      "ANNANZA": ["Annanza"],
-      "KENNIA": ["Kennia", "Agatha"],
-      "VIVIAN": ["Vivian", "Andre", "Maria Eduarda", "Gabriel"],
-      "LUCIA": ["Lucia", "Guilherme"],
-      "JUZAO": ["Julia", "Isabele"],
-      "WENDELL": ["Wendell", "Claudia"],
-      "LUAN": ["Luan", "Marcelle", "Noah"],
-      "LUCAS": ["Lucas", "João"],
-      "PEIXONA": ["Cristina", "Gabriella", "Mayara"],
-      "RIOCLASSICA": ["Adamis", "Fernanda", "Isabel", "Tereza"],
-      "MION": ["Alexey", "Camila", "Joana", "José", "João", "Maria"],
-      "RICARDO": ["Carol", "Ricardo", "Ester"],
-      "ASTRO": ["Hermano", "Tainá", "Adriana", "Pedrinho"],
-      "PINGO": ["Edson", "Adriana", "Luiza", "Jonny", "Vinicius"],
-      "MOSQUITO": ["Luiz Felipe", "Beatriz"],
-      "BUIU": ["Renato", "Marisa"],
-      "TATA": ["Renata", "Flavio", "Davi"],
-      "CACAU": ["Vinicius"],
-      "GEMIOS01": ["Danilo", "Lais", "Mateos", "Felipe"],
-      "GUIDIN": ["Emanuelle", "Ben Hur", "Guido"],
-      "RAFA": ["Rafaela", "Thiago", "Kaylane", "Heitor"],
-      "MARI": ["Mariana", "Giovane", "Maria Luiza", "Estela"],
-      "PENTEADO": ["Fabiana", "Roberto", "Pedro", "Davi", "Heitor"],
-      "ALDI": ["Aldilene", "Leonardo"],
-      "MAGNO": ["Magno", "Nathalia", "Sofia", "José", "Suzana", "Sara"],
-      "MARIANA": ["Mariana", "Edimar"],
-      "JOYCE": ["Joyce"],
-      "QUEQUEL": ["Raquel"],
-      "PAZ": ["Jose", "Maria da Paz"],
-      "GEMIOS02": ["Pablo", "Sony"]
+    // códigos de teste, só pra demonstração — não usar pra confirmar de verdade
+    var DEMO = {
+      "NOME01": ["Fulano", "Fulana"],
+      "NOME02": ["Cicero"]
     };
 
     var codeInput = document.getElementById("familyCode");
@@ -337,7 +298,7 @@
     var namesList = document.getElementById("namesList");
     var confirmBtn = document.getElementById("confirmBtn");
 
-    function renderNames(names) {
+    function renderNames(names, locked) {
       namesList.innerHTML = "";
       names.forEach(function (name) {
         var row = document.createElement("div");
@@ -379,6 +340,12 @@
         yesBtn.addEventListener("click", function () { setState("yes"); });
         noBtn.addEventListener("click", function () { setState("no"); });
 
+        if (locked) {
+          yesBtn.disabled = true;
+          noBtn.disabled = true;
+          rest.disabled = true;
+        }
+
         row.appendChild(fixed);
         row.appendChild(toggle);
         row.appendChild(rest);
@@ -386,7 +353,10 @@
       });
     }
 
+    var lookupTimer = null;
+
     codeInput.addEventListener("input", function () {
+      clearTimeout(lookupTimer);
       var code = codeInput.value.trim().toUpperCase();
       if (!code) {
         reveal.classList.remove("is-visible");
@@ -394,20 +364,46 @@
         hint.classList.remove("not-found");
         return;
       }
-      var names = FAMILIES[code];
-      if (names) {
-        renderNames(names);
+
+      if (DEMO[code]) {
+        renderNames(DEMO[code], false);
+        confirmBtn.disabled = false;
         reveal.classList.add("is-visible");
-        hint.textContent = "Encontramos sua família! Marque quem vem.";
+        hint.textContent = "Modo de teste — nomes de exemplo, não confirma nada de verdade.";
         hint.classList.remove("not-found");
-      } else {
-        reveal.classList.remove("is-visible");
-        hint.textContent = "Não encontramos esse código — confira com quem te chamou.";
-        hint.classList.add("not-found");
+        return;
       }
+
+      hint.textContent = "Procurando sua família...";
+      hint.classList.remove("not-found");
+      lookupTimer = setTimeout(function () { buscarFamilia(code); }, 500);
     });
 
-    var SCRIPT_URL = "__SCRIPT_URL__"; // cole aqui a URL do Apps Script quando publicar
+    function buscarFamilia(code) {
+      fetch(SCRIPT_URL + "?code=" + encodeURIComponent(code))
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+          if (codeInput.value.trim().toUpperCase() !== code) return;
+          if (data.found) {
+            renderNames(data.names, data.alreadyConfirmed);
+            confirmBtn.disabled = !!data.alreadyConfirmed;
+            reveal.classList.add("is-visible");
+            hint.textContent = data.alreadyConfirmed
+              ? "Essa família já confirmou presença antes. Se precisar mudar algo, fale direto com o Uriel."
+              : "Encontramos sua família! Marque quem vem.";
+            hint.classList.toggle("not-found", !!data.alreadyConfirmed);
+          } else {
+            reveal.classList.remove("is-visible");
+            hint.textContent = "Não encontramos esse código — confira com quem te chamou.";
+            hint.classList.add("not-found");
+          }
+        })
+        .catch(function () {
+          reveal.classList.remove("is-visible");
+          hint.textContent = "Não conseguimos verificar agora — confira sua internet e tente de novo.";
+          hint.classList.add("not-found");
+        });
+    }
 
     confirmBtn.addEventListener("click", function () {
       var code = codeInput.value.trim().toUpperCase();
