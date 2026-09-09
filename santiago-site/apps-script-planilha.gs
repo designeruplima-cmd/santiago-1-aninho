@@ -10,6 +10,11 @@
 // como "já confirmado". Usados só pelo próprio Uriel/família pra testar o fluxo.
 var TEST_CODES = ["ANATESTE", "URIELTESTE"];
 
+// Planilha "1 ano Santiago - Lista de Convidados" (a de nomes individuais/apelidos),
+// onde cada confirmação real cai automaticamente numa aba de revisão.
+var REVIEW_SHEET_ID = "18FToLa0bzzg65OQ-BKP-bvhnaHV8QrtbxW0A2CMt6tE";
+var REVIEW_TAB_NAME = "Confirmações a revisar";
+
 function doPost(e) {
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
@@ -40,6 +45,11 @@ function doPost(e) {
       sheet.getRange(i + 1, 10).setValue(notComing);                                // J - Não vão
       sheet.getRange(i + 1, 11).setValue(new Date());                               // K - Data da confirmação
 
+      if (!isTestCode) {
+        var familyName = String(values[i][2] || "");
+        logConfirmacaoParaRevisao(code, familyName, coming, notComing, msgParents, msgSanti);
+      }
+
       return ContentService.createTextOutput(JSON.stringify({ status: "ok" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
@@ -47,6 +57,31 @@ function doPost(e) {
       .setMimeType(ContentService.MimeType.JSON);
   } finally {
     lock.releaseLock();
+  }
+}
+
+/**
+ * Escreve uma linha na aba "Confirmações a revisar" da planilha de convidados
+ * (arquivo separado), pra o Uriel conferir e marcar manualmente quem confirmou
+ * naquela lista de nomes individuais — sem tentar adivinhar por nome parecido.
+ * Se a aba ainda não existir, ela é criada sozinha com o cabeçalho.
+ */
+function logConfirmacaoParaRevisao(code, familyName, coming, notComing, msgParents, msgSanti) {
+  try {
+    var reviewSpreadsheet = SpreadsheetApp.openById(REVIEW_SHEET_ID);
+    var reviewSheet = reviewSpreadsheet.getSheetByName(REVIEW_TAB_NAME);
+    if (!reviewSheet) {
+      reviewSheet = reviewSpreadsheet.insertSheet(REVIEW_TAB_NAME);
+      reviewSheet.getRange(1, 1, 1, 6).setValues([[
+        "Data/hora", "Código da família", "Nome da família",
+        "Confirmaram presença", "Não vão", "Recados"
+      ]]);
+    }
+    var recados = [msgParents, msgSanti].filter(function (m) { return m; }).join(" | ");
+    reviewSheet.appendRow([new Date(), code, familyName, coming, notComing, recados]);
+  } catch (errReview) {
+    // Uma falha aqui não deve impedir a confirmação de valer na planilha principal.
+    Logger.log("Não consegui gravar na aba de revisão: " + errReview);
   }
 }
 
