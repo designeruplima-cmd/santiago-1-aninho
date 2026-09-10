@@ -95,6 +95,9 @@
   .badge.confirmado { background: #e4f3e9; color: var(--ok); }
   .badge.pendente { background: var(--cream2); color: var(--ink-soft); }
   .badge.recusado { background: #f6e6e2; color: var(--danger); }
+  .badge.enviado { background: #e3edf7; color: var(--blue); }
+
+  .family-card.is-confirmed { background: #f2faf4; border-color: #cfe9d7; }
   .family-card .nome { font-size: 15.5px; color: var(--ink); margin: 4px 0 2px; font-weight: 600; }
   .family-card .pessoas, .family-card .telefone {
     font-size: 14px; color: var(--ink-soft); margin: 0;
@@ -132,6 +135,25 @@
 
   .section-title {
     font-family: "Fraunces", serif; font-weight: 620; font-size: 17px; margin: 22px 0 10px;
+  }
+
+  .confirm-row {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 4px 16px; margin-bottom: 10px; overflow: hidden;
+  }
+  .confirm-row-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 12px 0; cursor: pointer;
+  }
+  .confirm-row-nome {
+    font-family: "Fraunces", serif; font-weight: 640; font-size: 16.5px; color: var(--ink);
+  }
+  .confirm-row-details { display: none; padding: 0 0 14px; }
+  .confirm-row.is-open .confirm-row-details { display: block; }
+  .confirm-row-details .pessoas { font-size: 14px; color: var(--ink-soft); margin: 0 0 6px; }
+  .confirm-row-details .recado {
+    font-size: 13.5px; color: var(--ink); background: var(--cream2);
+    border-radius: 10px; padding: 8px 10px; line-height: 1.4; margin-top: 4px;
   }
 
   .guest-row {
