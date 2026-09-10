@@ -173,6 +173,7 @@ function routeAction(action, e, body) {
       case "setTemplate":  return actionSetTemplate(body || {});
       case "listGuests":   return actionListGuests();
       case "toggleGuest":  return actionToggleGuestConfirmed(body || {});
+      case "markSent":     return actionMarkSent(body || {});
       default:
         return jsonOut({ status: "error", message: "ação desconhecida: " + action });
     }
@@ -205,6 +206,7 @@ function actionListAll() {
       pessoasRaw: String(row[3] || ""),
       pessoas: splitNames(row[3]),
       telefone: String(row[4] || ""),
+      enviado: !!String(row[5] || "").trim(),
       confirmado: String(row[6] || ""),
       msgParents: String(row[7] || ""),
       msgSanti: String(row[8] || ""),
@@ -308,6 +310,33 @@ function actionDeleteFamily(body) {
       var rowCode = String(values[i][0]).trim().toUpperCase();
       if (rowCode !== codigo) continue;
       sheet.deleteRow(i + 1);
+      return jsonOut({ status: "ok" });
+    }
+    return jsonOut({ status: "not_found", codigo: codigo });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/**
+ * Marca que o WhatsApp já foi enviado pra essa família (coluna F, que antes
+ * ficava em branco). Chamado automaticamente pelo painel ao clicar em
+ * "Enviar WhatsApp" — não afeta o fluxo de confirmar.html, que nunca lê essa
+ * coluna.
+ */
+function actionMarkSent(body) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var codigo = String(body.codigo || "").trim().toUpperCase();
+    if (!codigo) return jsonOut({ status: "error", message: "Código é obrigatório." });
+
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+    var values = sheet.getDataRange().getValues();
+    for (var i = 1; i < values.length; i++) {
+      var rowCode = String(values[i][0]).trim().toUpperCase();
+      if (rowCode !== codigo) continue;
+      sheet.getRange(i + 1, 6).setValue(new Date()); // F - Enviado
       return jsonOut({ status: "ok" });
     }
     return jsonOut({ status: "not_found", codigo: codigo });
