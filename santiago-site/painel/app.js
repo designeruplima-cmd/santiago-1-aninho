@@ -138,7 +138,8 @@
   function statusBadge(family) {
     if (family.confirmado) return { cls: "confirmado", label: "Confirmado" };
     if (family.naoConfirmado) return { cls: "recusado", label: "Não vem" };
-    return { cls: "pendente", label: "Pendente" };
+    if (family.enviado) return { cls: "enviado", label: "Enviado" };
+    return { cls: "pendente", label: "Não enviado" };
   }
 
   // ---------------------------------------------------------------------
@@ -183,7 +184,7 @@
     list.forEach(function (family) {
       var badge = statusBadge(family);
       var card = document.createElement("div");
-      card.className = "family-card";
+      card.className = "family-card" + (family.confirmado ? " is-confirmed" : "");
 
       var recadoHtml = "";
       if (family.msgParents || family.msgSanti) {
@@ -230,6 +231,11 @@
       var link = buildWhatsAppLink(family);
       if (!link) { alert("Essa família ainda não tem telefone cadastrado."); return; }
       window.open(link, "_blank");
+      if (!family.enviado) {
+        family.enviado = true;
+        renderFamilias();
+        callPost("markSent", { codigo: family.codigo }).catch(function () {});
+      }
     } else if (btn.dataset.action === "edit") {
       startEdit(family);
     } else if (btn.dataset.action === "delete") {
@@ -388,6 +394,10 @@
   var guestsStatus = document.getElementById("guestsStatus");
   var guestsList = document.getElementById("guestsList");
 
+  // guarda quais famílias estão "abertas" na lista de confirmados, pra não
+  // fechar tudo de novo toda vez que os dados são recarregados
+  var expandedConfirmados = {};
+
   function renderConfirmados() {
     var list = state.families.filter(function (f) { return f.confirmado || f.naoConfirmado; });
     confirmadosStatus.textContent = "";
@@ -398,8 +408,12 @@
     }
     list.forEach(function (family) {
       var badge = statusBadge(family);
-      var card = document.createElement("div");
-      card.className = "family-card";
+      var isOpen = !!expandedConfirmados[family.codigo];
+
+      var row = document.createElement("div");
+      row.className = "confirm-row" + (isOpen ? " is-open" : "");
+      row.dataset.codigo = family.codigo;
+
       var recadoHtml = "";
       if (family.msgParents || family.msgSanti) {
         recadoHtml = '<div class="recado">' +
@@ -408,18 +422,31 @@
           (family.msgSanti ? "🎈 " + escapeHtml(family.msgSanti) : "") +
           "</div>";
       }
-      card.innerHTML =
-        '<div class="top-row">' +
-          '<div class="codigo">' + escapeHtml(family.codigo) + '</div>' +
+
+      row.innerHTML =
+        '<div class="confirm-row-header">' +
+          '<span class="confirm-row-nome">' + escapeHtml(family.nome) + '</span>' +
           '<div class="badge ' + badge.cls + '">' + badge.label + '</div>' +
         '</div>' +
-        '<p class="nome">' + escapeHtml(family.nome) + '</p>' +
-        '<p class="pessoas">Vêm: ' + escapeHtml(family.confirmado || "—") + '</p>' +
-        (family.naoConfirmado ? '<p class="pessoas">Não vêm: ' + escapeHtml(family.naoConfirmado) + '</p>' : "") +
-        recadoHtml;
-      confirmadosList.appendChild(card);
+        '<div class="confirm-row-details">' +
+          '<p class="pessoas">Código: ' + escapeHtml(family.codigo) + '</p>' +
+          '<p class="pessoas">Vêm: ' + escapeHtml(family.confirmado || "—") + '</p>' +
+          (family.naoConfirmado ? '<p class="pessoas">Não vêm: ' + escapeHtml(family.naoConfirmado) + '</p>' : "") +
+          (recadoHtml || '<p class="pessoas">Sem recados.</p>') +
+        '</div>';
+
+      confirmadosList.appendChild(row);
     });
   }
+
+  confirmadosList.addEventListener("click", function (e) {
+    var header = e.target.closest(".confirm-row-header");
+    if (!header) return;
+    var row = header.closest(".confirm-row");
+    var codigo = row.dataset.codigo;
+    expandedConfirmados[codigo] = !expandedConfirmados[codigo];
+    row.classList.toggle("is-open", expandedConfirmados[codigo]);
+  });
 
   function loadGuests() {
     guestsStatus.textContent = "Carregando...";
