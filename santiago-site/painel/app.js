@@ -12,8 +12,9 @@
     pin: "",
     families: [],
     guests: [],
-    template: "",
-    editingCode: null // se preenchido, o form de "Adicionar" vira "Editar"
+    templates: [], // lista de mensagens salvas — uma delas tem ativo:true
+    editingCode: null, // se preenchido, o form de "Adicionar" vira "Editar"
+    editingTemplateId: null // se preenchido, o form de "Mensagem" vira "Editar"
   };
 
   // ---------------------------------------------------------------------
@@ -62,7 +63,7 @@
         localStorage.setItem(PIN_STORAGE_KEY, pin);
         state.families = data.families || [];
         showApp();
-        loadTemplate();
+        loadTemplates();
         loadGuests();
       } else {
         pinError.textContent = "Não conseguimos entrar agora. Confira sua internet.";
@@ -125,8 +126,17 @@
     return digits;
   }
 
+  function getActiveTemplateText() {
+    var ativa = state.templates.find(function (t) { return t.ativo; });
+    if (ativa) return ativa.conteudo;
+    if (state.templates.length) return state.templates[0].conteudo; // sem nenhuma marcada, usa a primeira
+    return "";
+  }
+
   function buildWhatsAppLink(family) {
-    var text = state.template
+    var templateText = getActiveTemplateText();
+    if (!templateText) return null;
+    var text = templateText
       .replace(/\{nome\}/g, family.nome)
       .replace(/\{codigo\}/g, family.codigo)
       .replace(/\{link\}/g, FRONT_LINK);
@@ -228,6 +238,7 @@
     if (!family) return;
 
     if (btn.dataset.action === "wa") {
+      if (!getActiveTemplateText()) { alert("Cadastre uma mensagem na aba Mensagem antes de enviar."); return; }
       var link = buildWhatsAppLink(family);
       if (!link) { alert("Essa família ainda não tem telefone cadastrado."); return; }
       window.open(link, "_blank");
@@ -508,54 +519,209 @@
   });
 
   // ---------------------------------------------------------------------
-  // Aba Mensagem
+  // Aba Mensagem — agora com várias mensagens salvas, uma delas "Ativa"
+  // (é essa que o botão "Enviar WhatsApp" usa em cada família).
   // ---------------------------------------------------------------------
-  var templateInput = document.getElementById("templateInput");
-  var templatePreview = document.getElementById("templatePreview");
-  var btnSalvarTemplate = document.getElementById("btnSalvarTemplate");
-  var templateStatus = document.getElementById("templateStatus");
+  var templatesStatus = document.getElementById("templatesStatus");
+  var templatesList = document.getElementById("templatesList");
+  var btnNovaMensagem = document.getElementById("btnNovaMensagem");
+  var templateForm = document.getElementById("templateForm");
+  var templateFormTitle = document.getElementById("templateFormTitle");
+  var tNome = document.getElementById("tNome");
+  var tConteudo = document.getElementById("tConteudo");
+  var btnSalvarTemplateForm = document.getElementById("btnSalvarTemplateForm");
+  var btnCancelarTemplateForm = document.getElementById("btnCancelarTemplateForm");
+  var templateFormStatus = document.getElementById("templateFormStatus");
+  var templateFormPreview = document.getElementById("templateFormPreview");
 
-  function loadTemplate() {
-    callGet("getTemplate").then(function (data) {
+  // guarda quais mensagens estão "abertas" na lista, pra não fechar tudo
+  // de novo toda vez que os dados são recarregados
+  var expandedTemplates = {};
+
+  function loadTemplates() {
+    templatesStatus.textContent = "Carregando...";
+    templatesStatus.classList.remove("error");
+    callGet("listTemplates").then(function (data) {
       if (data.status === "ok") {
-        state.template = data.template;
-        templateInput.value = data.template;
-        updatePreview();
+        state.templates = data.templates || [];
+        templatesStatus.textContent = "";
+        renderTemplates();
+      } else {
+        templatesStatus.textContent = "Não consegui carregar as mensagens.";
+        templatesStatus.classList.add("error");
       }
-    }).catch(function () {});
+    }).catch(function () {
+      templatesStatus.textContent = "Sem conexão — confira sua internet.";
+      templatesStatus.classList.add("error");
+    });
   }
 
-  function updatePreview() {
+  function renderTemplates() {
+    templatesList.innerHTML = "";
+    if (!state.templates.length) {
+      templatesList.innerHTML = '<div class="empty-state">Nenhuma mensagem cadastrada ainda.</div>';
+      return;
+    }
+    state.templates.forEach(function (tpl) {
+      var isOpen = !!expandedTemplates[tpl.id];
+      var row = document.createElement("div");
+      row.className = "template-row" + (isOpen ? " is-open" : "") + (tpl.ativo ? " is-active-template" : "");
+      row.dataset.id = tpl.id;
+      row.innerHTML =
+        '<div class="template-row-header">' +
+          '<span class="template-row-nome">' + escapeHtml(tpl.nome) + '</span>' +
+          (tpl.ativo ? '<div class="badge ativa">Ativa</div>' : '') +
+        '</div>' +
+        '<div class="template-row-details">' +
+          '<div class="preview-box">' + escapeHtml(tpl.conteudo) + '</div>' +
+          '<div class="actions">' +
+            (tpl.ativo ? '' : '<button class="btn whatsapp" data-action="ativar" data-id="' + tpl.id + '">Ativar</button>') +
+            '<button class="btn edit" data-action="editar" data-id="' + tpl.id + '">Editar</button>' +
+            '<button class="btn delete" data-action="excluir" data-id="' + tpl.id + '">Excluir</button>' +
+          '</div>' +
+        '</div>';
+      templatesList.appendChild(row);
+    });
+  }
+
+  templatesList.addEventListener("click", function (e) {
+    var actionBtn = e.target.closest("button[data-action]");
+    if (actionBtn) {
+      var id = actionBtn.dataset.id;
+      var tpl = state.templates.find(function (t) { return t.id === id; });
+      if (!tpl) return;
+      if (actionBtn.dataset.action === "ativar") {
+        ativarTemplate(id);
+      } else if (actionBtn.dataset.action === "editar") {
+        startEditTemplate(tpl);
+      } else if (actionBtn.dataset.action === "excluir") {
+        if (confirm('Tem certeza que quer excluir a mensagem "' + tpl.nome + '"? Isso não pode ser desfeito.')) {
+          excluirTemplate(id);
+        }
+      }
+      return;
+    }
+    var header = e.target.closest(".template-row-header");
+    if (!header) return;
+    var row = header.closest(".template-row");
+    var id = row.dataset.id;
+    expandedTemplates[id] = !expandedTemplates[id];
+    row.classList.toggle("is-open", expandedTemplates[id]);
+  });
+
+  function ativarTemplate(id) {
+    // atualização otimista — reflete na hora, recarrega se der erro
+    state.templates.forEach(function (t) { t.ativo = (t.id === id); });
+    renderTemplates();
+    callPost("activateTemplate", { id: id }).then(function (data) {
+      if (data.status !== "ok") {
+        alert("Não consegui ativar essa mensagem agora. Tenta de novo.");
+        loadTemplates();
+      }
+    }).catch(function () {
+      alert("Sem conexão — tenta de novo.");
+      loadTemplates();
+    });
+  }
+
+  function excluirTemplate(id) {
+    callPost("deleteTemplate", { id: id }).then(function (data) {
+      if (data.status === "ok") {
+        delete expandedTemplates[id];
+        loadTemplates();
+      } else {
+        alert("Não consegui excluir agora. Tenta de novo.");
+      }
+    }).catch(function () {
+      alert("Sem conexão — confira sua internet.");
+    });
+  }
+
+  function updateTemplateFormPreview() {
     var sample = state.families[0] || { nome: "Norma", codigo: "NORMA01" };
-    var text = templateInput.value
+    var text = tConteudo.value
       .replace(/\{nome\}/g, sample.nome)
       .replace(/\{codigo\}/g, sample.codigo)
       .replace(/\{link\}/g, FRONT_LINK);
-    templatePreview.textContent = text;
+    templateFormPreview.textContent = text;
+  }
+  tConteudo.addEventListener("input", updateTemplateFormPreview);
+
+  function abrirFormularioTemplate() {
+    templateFormStatus.textContent = "";
+    templateFormStatus.classList.remove("error");
+    templateForm.style.display = "block";
+    templateForm.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  templateInput.addEventListener("input", updatePreview);
+  btnNovaMensagem.addEventListener("click", function () {
+    state.editingTemplateId = null;
+    templateFormTitle.textContent = "Nova mensagem";
+    tNome.value = "";
+    tConteudo.value = "";
+    updateTemplateFormPreview();
+    abrirFormularioTemplate();
+  });
 
-  btnSalvarTemplate.addEventListener("click", function () {
-    var template = templateInput.value.trim();
-    if (!template) return;
-    templateStatus.textContent = "Salvando...";
-    templateStatus.classList.remove("error");
-    btnSalvarTemplate.disabled = true;
-    callPost("setTemplate", { template: template }).then(function (data) {
-      btnSalvarTemplate.disabled = false;
+  function startEditTemplate(tpl) {
+    state.editingTemplateId = tpl.id;
+    templateFormTitle.textContent = "Editar mensagem";
+    tNome.value = tpl.nome;
+    tConteudo.value = tpl.conteudo;
+    updateTemplateFormPreview();
+    abrirFormularioTemplate();
+  }
+
+  btnCancelarTemplateForm.addEventListener("click", function () {
+    templateForm.style.display = "none";
+    state.editingTemplateId = null;
+  });
+
+  btnSalvarTemplateForm.addEventListener("click", function () {
+    var nome = tNome.value.trim();
+    var conteudo = tConteudo.value.trim();
+    if (!nome || !conteudo) {
+      templateFormStatus.textContent = "Preenche o nome e o texto da mensagem.";
+      templateFormStatus.classList.add("error");
+      return;
+    }
+    templateFormStatus.classList.remove("error");
+    templateFormStatus.textContent = "Salvando...";
+    btnSalvarTemplateForm.disabled = true;
+
+    if (state.editingTemplateId) {
+      callPost("editTemplate", { id: state.editingTemplateId, nome: nome, conteudo: conteudo }).then(function (data) {
+        btnSalvarTemplateForm.disabled = false;
+        if (data.status === "ok") {
+          templateFormStatus.textContent = "Mensagem atualizada!";
+          loadTemplates();
+          setTimeout(function () { templateForm.style.display = "none"; }, 800);
+        } else {
+          templateFormStatus.textContent = "Não encontrei essa mensagem pra atualizar.";
+          templateFormStatus.classList.add("error");
+        }
+      }).catch(function () {
+        btnSalvarTemplateForm.disabled = false;
+        templateFormStatus.textContent = "Sem conexão — tenta de novo.";
+        templateFormStatus.classList.add("error");
+      });
+      return;
+    }
+
+    callPost("addTemplate", { nome: nome, conteudo: conteudo }).then(function (data) {
+      btnSalvarTemplateForm.disabled = false;
       if (data.status === "ok") {
-        state.template = template;
-        templateStatus.textContent = "Mensagem salva!";
-        setTimeout(function () { templateStatus.textContent = ""; }, 1800);
+        templateFormStatus.textContent = "Mensagem criada!";
+        loadTemplates();
+        setTimeout(function () { templateForm.style.display = "none"; }, 800);
       } else {
-        templateStatus.textContent = "Não consegui salvar agora.";
-        templateStatus.classList.add("error");
+        templateFormStatus.textContent = data.message || "Não consegui salvar agora.";
+        templateFormStatus.classList.add("error");
       }
     }).catch(function () {
-      btnSalvarTemplate.disabled = false;
-      templateStatus.textContent = "Sem conexão — tenta de novo.";
-      templateStatus.classList.add("error");
+      btnSalvarTemplateForm.disabled = false;
+      templateFormStatus.textContent = "Sem conexão — tenta de novo.";
+      templateFormStatus.classList.add("error");
     });
   });
 
