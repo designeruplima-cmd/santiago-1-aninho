@@ -169,8 +169,11 @@ function routeAction(action, e, body) {
       case "addFamily":    return actionAddFamily(body || {});
       case "editFamily":   return actionEditFamily(body || {});
       case "deleteFamily": return actionDeleteFamily(body || {});
-      case "getTemplate":  return actionGetTemplate();
-      case "setTemplate":  return actionSetTemplate(body || {});
+      case "listTemplates":    return actionListTemplates();
+      case "addTemplate":      return actionAddTemplate(body || {});
+      case "editTemplate":     return actionEditTemplate(body || {});
+      case "deleteTemplate":   return actionDeleteTemplate(body || {});
+      case "activateTemplate": return actionActivateTemplate(body || {});
       case "listGuests":   return actionListGuests();
       case "toggleGuest":  return actionToggleGuestConfirmed(body || {});
       case "markSent":     return actionMarkSent(body || {});
@@ -345,41 +348,156 @@ function actionMarkSent(body) {
   }
 }
 
-function getOrCreateConfigSheet() {
+/**
+ * Aba "Configuração" — agora guarda VÁRIAS mensagens de WhatsApp (não só uma),
+ * cada linha com [ID, Nome, Mensagem, Ativa]. A coluna "Ativa" só tem "Sim" em
+ * UMA linha por vez: essa é a mensagem que o botão "Enviar WhatsApp" usa.
+ * Se a aba ainda estiver no formato antigo (uma mensagem só, colunas
+ * "Chave"/"Valor"), essa função migra sozinha pro formato novo, preservando
+ * o texto que já estava salvo.
+ */
+function getMessagesSheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getSheetByName(CONFIG_TAB_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(CONFIG_TAB_NAME);
-    sheet.getRange(1, 1, 1, 2).setValues([["Chave", "Valor"]]);
-    sheet.getRange(2, 1, 1, 2).setValues([[TEMPLATE_KEY, DEFAULT_TEMPLATE]]);
+    sheet.getRange(1, 1, 1, 4).setValues([["ID", "Nome", "Mensagem", "Ativa"]]);
+    sheet.getRange(2, 1, 1, 4).setValues([["m1", "Mensagem padrão", DEFAULT_TEMPLATE, "Sim"]]);
+    return sheet;
+  }
+
+  var primeiroCabecalho = String(sheet.getRange(1, 1).getValue()).trim();
+  if (primeiroCabecalho === "Chave") {
+    var oldValues = sheet.getDataRange().getValues();
+    var oldTemplate = DEFAULT_TEMPLATE;
+    for (var i = 1; i < oldValues.length; i++) {
+      if (String(oldValues[i][0]).trim() === TEMPLATE_KEY) {
+        oldTemplate = String(oldValues[i][1] || DEFAULT_TEMPLATE);
+        break;
+      }
+    }
+    sheet.clear();
+    sheet.getRange(1, 1, 1, 4).setValues([["ID", "Nome", "Mensagem", "Ativa"]]);
+    sheet.getRange(2, 1, 1, 4).setValues([["m1", "Mensagem padrão", oldTemplate, "Sim"]]);
   }
   return sheet;
 }
 
-function actionGetTemplate() {
-  var sheet = getOrCreateConfigSheet();
+function actionListTemplates() {
+  var sheet = getMessagesSheet();
   var values = sheet.getDataRange().getValues();
+  var templates = [];
   for (var i = 1; i < values.length; i++) {
-    if (String(values[i][0]).trim() === TEMPLATE_KEY) {
-      return jsonOut({ status: "ok", template: String(values[i][1] || DEFAULT_TEMPLATE) });
-    }
+    if (!String(values[i][0]).trim()) continue;
+    templates.push({
+      id: String(values[i][0]),
+      nome: String(values[i][1] || ""),
+      conteudo: String(values[i][2] || ""),
+      ativo: String(values[i][3] || "").trim().toLowerCase() === "sim"
+    });
   }
-  return jsonOut({ status: "ok", template: DEFAULT_TEMPLATE });
+  return jsonOut({ status: "ok", templates: templates });
 }
 
-function actionSetTemplate(body) {
-  var template = String(body.template || "").trim();
-  if (!template) return jsonOut({ status: "error", message: "Template vazio." });
-  var sheet = getOrCreateConfigSheet();
-  var values = sheet.getDataRange().getValues();
-  for (var i = 1; i < values.length; i++) {
-    if (String(values[i][0]).trim() === TEMPLATE_KEY) {
-      sheet.getRange(i + 1, 2).setValue(template);
+function actionAddTemplate(body) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var nome = String(body.nome || "").trim();
+    var conteudo = String(body.conteudo || "").trim();
+    if (!nome || !conteudo) {
+      return jsonOut({ status: "error", message: "Nome e texto da mensagem são obrigatórios." });
+    }
+
+    var sheet = getMessagesSheet();
+    var values = sheet.getDataRange().getValues();
+    var isFirst = values.length <= 1; // só tem o cabeçalho ainda
+    var id = "m" + new Date().getTime();
+
+    sheet.appendRow([id, nome, conteudo, isFirst ? "Sim" : ""]);
+
+    return jsonOut({ status: "ok", template: { id: id, nome: nome, conteudo: conteudo, ativo: isFirst } });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function actionEditTemplate(body) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var id = String(body.id || "").trim();
+    if (!id) return jsonOut({ status: "error", message: "ID é obrigatório." });
+
+    var sheet = getMessagesSheet();
+    var values = sheet.getDataRange().getValues();
+    for (var i = 1; i < values.length; i++) {
+      if (String(values[i][0]) !== id) continue;
+      if (body.nome !== undefined) sheet.getRange(i + 1, 2).setValue(String(body.nome || ""));
+      if (body.conteudo !== undefined) sheet.getRange(i + 1, 3).setValue(String(body.conteudo || ""));
       return jsonOut({ status: "ok" });
     }
+    return jsonOut({ status: "not_found", id: id });
+  } finally {
+    lock.releaseLock();
   }
-  sheet.appendRow([TEMPLATE_KEY, template]);
-  return jsonOut({ status: "ok" });
+}
+
+function actionDeleteTemplate(body) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var id = String(body.id || "").trim();
+    if (!id) return jsonOut({ status: "error", message: "ID é obrigatório." });
+
+    var sheet = getMessagesSheet();
+    var values = sheet.getDataRange().getValues();
+    var rowIndex = -1;
+    var wasActive = false;
+    for (var i = 1; i < values.length; i++) {
+      if (String(values[i][0]) === id) {
+        rowIndex = i + 1;
+        wasActive = String(values[i][3] || "").trim().toLowerCase() === "sim";
+        break;
+      }
+    }
+    if (rowIndex === -1) return jsonOut({ status: "not_found", id: id });
+
+    sheet.deleteRow(rowIndex);
+
+    // se a mensagem excluída era a ativa, ativa a primeira que sobrou, pra
+    // nunca ficar sem nenhuma mensagem ativa.
+    if (wasActive) {
+      var remaining = sheet.getDataRange().getValues();
+      if (remaining.length > 1) {
+        sheet.getRange(2, 4).setValue("Sim");
+      }
+    }
+    return jsonOut({ status: "ok" });
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function actionActivateTemplate(body) {
+  var lock = LockService.getScriptLock();
+  lock.waitLock(10000);
+  try {
+    var id = String(body.id || "").trim();
+    if (!id) return jsonOut({ status: "error", message: "ID é obrigatório." });
+
+    var sheet = getMessagesSheet();
+    var values = sheet.getDataRange().getValues();
+    var found = false;
+    for (var i = 1; i < values.length; i++) {
+      var isMatch = String(values[i][0]) === id;
+      if (isMatch) found = true;
+      sheet.getRange(i + 1, 4).setValue(isMatch ? "Sim" : "");
+    }
+    return found ? jsonOut({ status: "ok" }) : jsonOut({ status: "not_found", id: id });
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 /**
