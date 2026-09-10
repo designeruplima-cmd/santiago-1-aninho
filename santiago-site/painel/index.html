@@ -156,6 +156,22 @@
     border-radius: 10px; padding: 8px 10px; line-height: 1.4; margin-top: 4px;
   }
 
+  .template-row {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 4px 16px; margin-bottom: 10px; overflow: hidden;
+  }
+  .template-row.is-active-template { background: #f2faf4; border-color: #cfe9d7; }
+  .template-row-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 12px 0; cursor: pointer;
+  }
+  .template-row-nome {
+    font-family: "Fraunces", serif; font-weight: 640; font-size: 16.5px; color: var(--ink);
+  }
+  .template-row-details { display: none; padding: 0 0 14px; }
+  .template-row.is-open .template-row-details { display: block; }
+  .badge.ativa { background: #e4f3e9; color: var(--ok); }
+
   .guest-row {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
     padding: 10px 4px; border-bottom: 1px solid var(--line); font-size: 15px;
@@ -263,19 +279,33 @@
 
     <!-- ---------- ABA MENSAGEM ---------- -->
     <section class="screen" id="screenMensagem">
-      <h2 class="section-title">Mensagem do WhatsApp</h2>
+      <h2 class="section-title">Mensagens do WhatsApp</h2>
       <p class="placeholder-hint">
         Use <code>{nome}</code> pro nome da família e <code>{codigo}</code> pro código dela —
-        são trocados automaticamente na hora de enviar.
+        são trocados automaticamente na hora de enviar. Toque numa mensagem pra ver o texto
+        completo. A mensagem marcada como "Ativa" é a que o botão "Enviar WhatsApp" usa.
       </p>
-      <div class="field">
-        <textarea id="templateInput" rows="10"></textarea>
-      </div>
-      <button class="btn primary" id="btnSalvarTemplate">Salvar mensagem</button>
-      <p id="templateStatus" class="status-msg"></p>
+      <div id="templatesStatus" class="status-msg">Carregando...</div>
+      <div id="templatesList"></div>
+      <button class="btn secondary" id="btnNovaMensagem" style="margin-top: 6px;">+ Nova mensagem</button>
 
-      <h2 class="section-title">Pré-visualização</h2>
-      <div class="preview-box" id="templatePreview"></div>
+      <div id="templateForm" style="display:none; margin-top: 22px;">
+        <h2 class="section-title" id="templateFormTitle">Nova mensagem</h2>
+        <div class="field">
+          <label for="tNome">Nome da mensagem</label>
+          <input id="tNome" type="text" placeholder="ex: Convite padrão">
+        </div>
+        <div class="field">
+          <label for="tConteudo">Texto da mensagem</label>
+          <textarea id="tConteudo" rows="10"></textarea>
+        </div>
+        <button class="btn primary" id="btnSalvarTemplateForm">Salvar mensagem</button>
+        <button class="btn secondary" id="btnCancelarTemplateForm" style="margin-top: 10px;">Cancelar</button>
+        <p id="templateFormStatus" class="status-msg"></p>
+
+        <h2 class="section-title">Pré-visualização</h2>
+        <div class="preview-box" id="templateFormPreview"></div>
+      </div>
     </section>
 
   </div>
