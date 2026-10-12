@@ -78,6 +78,20 @@
     margin: 0 auto 28px;
   }
 
+  .when-where {
+    background: #fff;
+    border: 1px solid var(--cream2);
+    border-radius: 18px;
+    padding: 16px 22px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 1.6;
+  }
+  .when-where strong { font-family: "Fraunces", serif; font-weight: 620; }
+  .when-where .ww-place { color: var(--ink-soft); font-size: 15.5px; }
+
   .how-to {
     background: var(--cream2);
     border-radius: 18px;
@@ -296,6 +310,11 @@
   <h1 class="page-title">Confirme sua presença</h1>
   <p class="page-lede">Preencha o código da sua família, marque quem vem e complete o nome de cada um.</p>
 
+  <div class="when-where">
+    <div><strong>28 de novembro</strong> · <strong>12h00</strong></div>
+    <div class="ww-place">Vila Encantada 1<br>Av. Vicente de Carvalho, 1329, Penha Circular, Rio de Janeiro</div>
+  </div>
+
   <div class="how-to" id="howToCard">
     <p class="how-to-title">Como confirmar, passo a passo</p>
     <ol>
@@ -309,7 +328,7 @@
   <div class="success-card" id="successCard">
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/><path d="M7.5 12.5l3 3 6-6.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
     <p class="success-title">Presença confirmada!</p>
-    <p class="success-lede">Já anotamos tudo certinho. Nos vemos na festa do Santiago! 💛</p>
+    <p class="success-lede">Já anotamos tudo certinho. Nos vemos na festa do Santiago! 💛<br><small>Levando você para o início...</small></p>
     <a class="success-btn" href="index.html">Voltar para o início</a>
   </div>
 
@@ -532,6 +551,7 @@
             document.getElementById("rsvpCard").style.display = "none";
             document.getElementById("successCard").classList.add("is-visible");
             window.scrollTo({ top: 0, behavior: "smooth" });
+            setTimeout(function () { window.location.href = "index.html"; }, 4000);
           } else if (data.status === "already_confirmed") {
             status.textContent = "Esse código já confirmou presença antes. Se precisar mudar algo, fale direto com o Uriel.";
             status.classList.add("is-error");
