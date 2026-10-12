@@ -409,7 +409,103 @@
   // fechar tudo de novo toda vez que os dados são recarregados
   var expandedConfirmados = {};
 
+  // ---------------------------------------------------------------------
+  // Dashboard da aba Confirmados
+  // ---------------------------------------------------------------------
+  var dashboardEl = document.getElementById("dashboard");
+  var PRAZO_CONFIRMACAO = new Date("2026-10-31T00:00:00-03:00").getTime();
+
+  // "Ana, Uriel e Davi" -> ["Ana","Uriel","Davi"]; ignora o texto de "sem ninguém marcado"
+  function splitList(raw) {
+    var s = String(raw || "").trim();
+    if (!s || /^Confirmado sem ninguém/i.test(s)) return [];
+    var i = s.lastIndexOf(" e ");
+    if (i > -1) s = s.substring(0, i) + ", " + s.substring(i + 3);
+    return s.split(",").map(function (n) { return n.trim(); }).filter(Boolean);
+  }
+
+  function computeDashboard() {
+    var d = { fam: 0, famVem: 0, famRecusou: 0, famAguardando: 0, vem: 0, nao: 0, aguardando: 0, total: 0, vao: [], naoVao: [], pend: [] };
+    state.families.forEach(function (f) {
+      var vem = splitList(f.confirmado), nao = splitList(f.naoConfirmado);
+      var resp = !!(f.confirmado || f.naoConfirmado);
+      var pessoas = (f.pessoas && f.pessoas.length) || 0;
+      var familia = Math.max(pessoas, vem.length + nao.length, 1);
+      d.fam++;
+      d.total += familia;
+      d.vem += vem.length; d.nao += nao.length;
+      vem.forEach(function (n) { d.vao.push({ nome: n, fam: f.nome }); });
+      nao.forEach(function (n) { d.naoVao.push({ nome: n, fam: f.nome }); });
+      if (f.confirmado) d.famVem++;
+      else if (f.naoConfirmado) d.famRecusou++;
+      else d.famAguardando++;
+      var falta = familia - vem.length - nao.length;
+      if (!resp) { d.aguardando += familia; d.pend.push(f); }
+      else if (falta > 0) d.aguardando += falta;
+    });
+    return d;
+  }
+
+  function renderDashboard() {
+    if (!dashboardEl) return;
+    if (!state.families.length) { dashboardEl.innerHTML = ""; return; }
+    var d = computeDashboard(), tot = Math.max(1, d.total);
+    var pct = function (n) { return Math.round(n / tot * 100); };
+    var C = 2 * Math.PI * 49, vemLen = C * d.vem / tot, naoLen = C * d.nao / tot, agLen = C * d.aguardando / tot;
+    var dias = Math.ceil((PRAZO_CONFIRMACAO - Date.now()) / 864e5);
+    var famResp = d.famVem + d.famRecusou;
+    var prazoTxt = Date.now() >= PRAZO_CONFIRMACAO ? "Prazo de confirmação encerrado em 31/10."
+      : "Prazo para confirmar: 31/10 (faltam " + dias + (dias === 1 ? " dia" : " dias") + ").";
+
+    var guestsMarcados = state.guests.filter(function (g) { return g.confirmado; }).length;
+    var guestsHtml = state.guests.length
+      ? '<div class="dash-sub"><span>Lista pessoa a pessoa</span><b>' + guestsMarcados + " de " + state.guests.length + ' marcados</b></div>' +
+        '<div class="seg"><span style="width:' + Math.round(guestsMarcados / state.guests.length * 100) + '%;background:var(--blue)"></span></div>'
+      : "";
+
+    function names(list, withFam) {
+      return list.map(function (x) {
+        return "<div><span>" + escapeHtml(x.nome) + "</span>" + (withFam ? "<small>" + escapeHtml(x.fam) + "</small>" : "") + "</div>";
+      }).join("") || '<div><span style="color:var(--ink-soft)">Ninguém ainda.</span></div>';
+    }
+    var pendHtml = d.pend.map(function (f) {
+      return "<div><span>" + escapeHtml(f.nome) + "</span><small>" + (f.enviado ? "Enviado" : "Não enviado") + "</small></div>";
+    }).join("") || '<div><span style="color:var(--ink-soft)">Todo mundo respondeu.</span></div>';
+
+    dashboardEl.innerHTML =
+      '<div class="dash">' +
+        '<div class="dash-top">' +
+          '<div class="donut"><svg viewBox="0 0 120 120">' +
+            '<circle cx="60" cy="60" r="49" stroke="var(--cream2)"/>' +
+            '<circle cx="60" cy="60" r="49" stroke="var(--ok)" stroke-dasharray="' + vemLen + " " + C + '" stroke-dashoffset="0"/>' +
+            '<circle cx="60" cy="60" r="49" stroke="var(--danger)" stroke-dasharray="' + naoLen + " " + C + '" stroke-dashoffset="' + (-vemLen) + '"/>' +
+            '<circle cx="60" cy="60" r="49" stroke="#d9cfb8" stroke-dasharray="' + agLen + " " + C + '" stroke-dashoffset="' + (-(vemLen + naoLen)) + '"/>' +
+          '</svg><div class="center"><b>' + d.vem + '</b><span>vão</span></div></div>' +
+          '<div class="dash-legend">' +
+            '<div class="lg"><i style="background:var(--ok)"></i>Vão<b>' + d.vem + "</b></div>" +
+            '<div class="lg"><i style="background:var(--danger)"></i>Não vão<b>' + d.nao + "</b></div>" +
+            '<div class="lg"><i style="background:#d9cfb8"></i>Sem resposta<b>' + d.aguardando + "</b></div>" +
+            '<div class="lg" style="color:var(--ink-soft)">Pessoas convidadas<b style="color:var(--ink)">' + d.total + "</b></div>" +
+          "</div>" +
+        "</div>" +
+        '<div class="dash-sub"><span>Famílias que responderam</span><b>' + famResp + " de " + d.fam + " (" + Math.round(famResp / Math.max(1, d.fam) * 100) + "%)</b></div>" +
+        '<div class="seg"><span style="width:' + (d.famVem / Math.max(1, d.fam) * 100) + '%;background:var(--ok)"></span>' +
+          '<span style="width:' + (d.famRecusou / Math.max(1, d.fam) * 100) + '%;background:var(--danger)"></span></div>' +
+        guestsHtml +
+        '<div class="dash-tiles">' +
+          '<div class="tile"><b>' + d.famVem + "</b><span>famílias vêm</span></div>" +
+          '<div class="tile"><b>' + d.famRecusou + "</b><span>recusaram</span></div>" +
+          '<div class="tile"><b>' + d.famAguardando + "</b><span>sem resposta</span></div>" +
+        "</div>" +
+        '<p class="dash-deadline">' + prazoTxt + "</p>" +
+      "</div>" +
+      '<details class="dash-list" open><summary><i style="background:var(--ok)"></i>Quem vai<em>' + d.vem + '</em></summary><div class="dash-names">' + names(d.vao, true) + "</div></details>" +
+      '<details class="dash-list"><summary><i style="background:var(--danger)"></i>Quem não vai<em>' + d.nao + '</em></summary><div class="dash-names">' + names(d.naoVao, true) + "</div></details>" +
+      '<details class="dash-list"><summary><i style="background:#d9cfb8"></i>Famílias sem resposta<em>' + d.famAguardando + '</em></summary><div class="dash-names">' + pendHtml + "</div></details>";
+  }
+
   function renderConfirmados() {
+    renderDashboard();
     var list = state.families.filter(function (f) { return f.confirmado || f.naoConfirmado; });
     confirmadosStatus.textContent = "";
     confirmadosList.innerHTML = "";
@@ -466,6 +562,7 @@
         state.guests = data.guests || [];
         guestsStatus.textContent = "";
         renderGuests();
+        renderDashboard();
       } else {
         guestsStatus.textContent = "Não consegui carregar a lista de convidados.";
         guestsStatus.classList.add("error");
@@ -477,6 +574,7 @@
   }
 
   function renderGuests() {
+    renderDashboard();
     guestsList.innerHTML = "";
     if (!state.guests.length) {
       guestsList.innerHTML = '<div class="empty-state">Nenhum convidado na lista.</div>';
