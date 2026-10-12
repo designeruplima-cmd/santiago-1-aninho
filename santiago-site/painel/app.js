@@ -437,6 +437,7 @@
   };
   var CRIANCAS = {
     PRIMOS: ["estevao", "tomaz", "afonso"],
+    ASTRO: ["pedrinho"],
     MAURA: ["maria flor"],
     ISAAC: ["isaac"],
     CAT: ["catarina"],
