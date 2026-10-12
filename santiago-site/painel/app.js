@@ -147,7 +147,7 @@
 
   function statusBadge(family) {
     if (family.confirmado) return { cls: "confirmado", label: "Confirmado" };
-    if (family.naoConfirmado) return { cls: "recusado", label: "Não vem" };
+    if (family.naoConfirmado) return { cls: "recusado", label: "Convite recusado" };
     if (family.enviado) return { cls: "enviado", label: "Enviado" };
     return { cls: "pendente", label: "Não enviado" };
   }
