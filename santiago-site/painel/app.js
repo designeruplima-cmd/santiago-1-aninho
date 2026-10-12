@@ -424,8 +424,8 @@
     return s.split(",").map(function (n) { return n.trim(); }).filter(Boolean);
   }
 
-  // Convidados de cortesia (não entram nas contas do dashboard). Chave = código da família,
-  // valor = primeiros nomes (sem acento, minúsculo) de quem é cortesia nela.
+  // Fora da conta do dashboard. Chave = código da família, valor = primeiros nomes
+  // (sem acento, minúsculo). Cortesia = adultos de cortesia; crianças = não entram na contagem.
   var CORTESIA = {
     PAULA03: ["paula", "lenivaldo"],
     MIVO: ["leandre", "josivanda"],
@@ -435,35 +435,63 @@
     ISAAC: ["jorge", "ana beatriz"],
     BOMBOM: ["lucas", "isabela"]
   };
+  var CRIANCAS = {
+    PRIMOS: ["estevao", "tomaz", "afonso"],
+    MAURA: ["maria flor"],
+    ISAAC: ["isaac"],
+    CAT: ["catarina"],
+    LUAN: ["noah"],
+    TATA: ["davi"],
+    MION: ["jose", "joao", "maria"],
+    VIVIAN: ["gabriel", "maria eduarda"],
+    GUIDIN: ["guido"],
+    GEMIOS01: ["mateos", "felipe"],
+    KENNIA: ["agatha"],
+    RIOCLASSICA: ["tereza", "isabel"],
+    MARI: ["estela", "maria luiza"],
+    RICARDO: ["ester"],
+    PENTEADO: ["pedro"],
+    NELMA7: ["maria julia"],
+    QUEQUEL: ["malu"],
+    TRIGEMEOS: ["gemeos", "helena"]
+  };
 
   function normName(s) {
     return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
   }
-  // "José José Victor Silva" casa com "jose"; "Ana Beatriz Rosa" casa com "ana beatriz"
-  function cortesiaKey(codigo, nome) {
-    var list = CORTESIA[codigo]; if (!list) return null;
-    var n = normName(nome);
-    for (var i = 0; i < list.length; i++) {
-      if (n === list[i] || n.indexOf(list[i] + " ") === 0) return list[i];
+  // "José José Victor Silva" casa com "jose"; "Ana Beatriz Rosa" casa com "ana beatriz".
+  // Devolve { k, tipo } ou null.
+  function foraKey(codigo, nome) {
+    var n = normName(nome), maps = [["Cortesia", CORTESIA[codigo]], ["Criança", CRIANCAS[codigo]]];
+    for (var m = 0; m < maps.length; m++) {
+      var list = maps[m][1]; if (!list) continue;
+      for (var i = 0; i < list.length; i++) {
+        if (n === list[i] || n.indexOf(list[i] + " ") === 0) return { k: list[i], tipo: maps[m][0] };
+      }
     }
     return null;
   }
 
   function computeDashboard() {
-    var d = { fam: 0, famVem: 0, famRecusou: 0, famAguardando: 0, vem: 0, nao: 0, aguardando: 0, total: 0, vao: [], naoVao: [], pend: [], cort: [] };
+    var d = { fam: 0, famVem: 0, famRecusou: 0, famAguardando: 0, vem: 0, nao: 0, aguardando: 0, total: 0, vao: [], naoVao: [], pend: [], fora: [] };
     state.families.forEach(function (f) {
       var vemAll = splitList(f.confirmado), naoAll = splitList(f.naoConfirmado);
       var pessoas = (f.pessoas && f.pessoas.length) || 0;
 
-      // quem é cortesia nessa família, e o que respondeu
-      var cortFam = {};
-      (f.pessoas || []).forEach(function (p) { var k = cortesiaKey(f.codigo, p); if (k) cortFam[k] = { nome: p, fam: f.nome, status: "Sem resposta" }; });
-      var vem = vemAll.filter(function (n) { var k = cortesiaKey(f.codigo, n); if (k) { (cortFam[k] = cortFam[k] || { nome: n, fam: f.nome }).status = "Vai"; (cortFam[k]).nome = n; return false; } return true; });
-      var nao = naoAll.filter(function (n) { var k = cortesiaKey(f.codigo, n); if (k) { (cortFam[k] = cortFam[k] || { nome: n, fam: f.nome }).status = "Não vai"; (cortFam[k]).nome = n; return false; } return true; });
-      var cortKeys = Object.keys(cortFam);
-      cortKeys.forEach(function (k) { d.cort.push(cortFam[k]); });
+      // quem está fora da conta (cortesia ou criança) nessa família, e o que respondeu
+      var foraFam = {};
+      (f.pessoas || []).forEach(function (p) { var r = foraKey(f.codigo, p); if (r) foraFam[r.k] = { nome: p, fam: f.nome, tipo: r.tipo, status: "Sem resposta" }; });
+      function marca(n, status) {
+        var r = foraKey(f.codigo, n); if (!r) return true;
+        var e = foraFam[r.k] = foraFam[r.k] || { fam: f.nome, tipo: r.tipo };
+        e.nome = n; e.status = status; return false;
+      }
+      var vem = vemAll.filter(function (n) { return marca(n, "Vai"); });
+      var nao = naoAll.filter(function (n) { return marca(n, "Não vai"); });
+      var foraKeys = Object.keys(foraFam);
+      foraKeys.forEach(function (k) { d.fora.push(foraFam[k]); });
 
-      var familia = Math.max(0, Math.max(pessoas, vemAll.length + naoAll.length) - cortKeys.length);
+      var familia = Math.max(0, Math.max(pessoas, vemAll.length + naoAll.length, 1) - foraKeys.length);
       d.fam++;
       d.total += familia; d.vem += vem.length; d.nao += nao.length;
       vem.forEach(function (n) { d.vao.push({ nome: n, fam: f.nome }); });
@@ -498,6 +526,13 @@
         return "<div><span>" + escapeHtml(x.nome) + "</span>" + (withFam ? "<small>" + escapeHtml(x.fam) + "</small>" : "") + "</div>";
       }).join("") || '<div><span style="color:var(--ink-soft)">Ninguém ainda.</span></div>';
     }
+    function foraList(tipo, cor) {
+      var arr = d.fora.filter(function (x) { return x.tipo === tipo; });
+      var vao = arr.filter(function (x) { return x.status === "Vai"; }).length;
+      var titulo = tipo === "Criança" ? "Crianças (fora da conta)" : "Cortesia (fora da conta)";
+      return '<details class="dash-list"><summary><i style="background:' + cor + '"></i>' + titulo + '<em>' + vao + " de " + arr.length + ' vão</em></summary><div class="dash-names">' +
+        arr.map(function (x) { return "<div><span>" + escapeHtml(x.nome) + "</span><small>" + escapeHtml(x.status) + " · " + escapeHtml(x.fam) + "</small></div>"; }).join("") + "</div></details>";
+    }
     var pendHtml = d.pend.map(function (f) {
       return "<div><span>" + escapeHtml(f.nome) + "</span><small>" + (f.enviado ? "Enviado" : "Não enviado") + "</small></div>";
     }).join("") || '<div><span style="color:var(--ink-soft)">Todo mundo respondeu.</span></div>';
@@ -515,7 +550,7 @@
             '<div class="lg"><i style="background:var(--ok)"></i>Vão<b>' + d.vem + "</b></div>" +
             '<div class="lg"><i style="background:var(--danger)"></i>Não vão<b>' + d.nao + "</b></div>" +
             '<div class="lg"><i style="background:#d9cfb8"></i>Sem resposta<b>' + d.aguardando + "</b></div>" +
-            '<div class="lg" style="color:var(--ink-soft)">Convidados (sem cortesia)<b style="color:var(--ink)">' + d.total + "</b></div>" +
+            '<div class="lg" style="color:var(--ink-soft)">Convidados (sem cortesia e crianças)<b style="color:var(--ink)">' + d.total + "</b></div>" +
           "</div>" +
         "</div>" +
         '<div class="dash-sub"><span>Famílias que responderam</span><b>' + famResp + " de " + d.fam + " (" + Math.round(famResp / Math.max(1, d.fam) * 100) + "%)</b></div>" +
@@ -531,7 +566,7 @@
       "</div>" +
       '<details class="dash-list" open><summary><i style="background:var(--ok)"></i>Quem vai<em>' + d.vem + '</em></summary><div class="dash-names">' + names(d.vao, true) + "</div></details>" +
       '<details class="dash-list"><summary><i style="background:var(--danger)"></i>Quem não vai<em>' + d.nao + '</em></summary><div class="dash-names">' + names(d.naoVao, true) + "</div></details>" +
-      '<details class="dash-list"><summary><i style="background:var(--blue)"></i>Cortesia (fora da conta)<em>' + d.cort.length + '</em></summary><div class="dash-names">' + d.cort.map(function (x) { return "<div><span>" + escapeHtml(x.nome) + "</span><small>" + escapeHtml(x.status) + " · " + escapeHtml(x.fam) + "</small></div>"; }).join("") + "</div></details>" +
+      foraList("Cortesia", "var(--blue)") + foraList("Criança", "#9b7bb8") +
       '<details class="dash-list"><summary><i style="background:#d9cfb8"></i>Famílias sem resposta<em>' + d.famAguardando + '</em></summary><div class="dash-names">' + pendHtml + "</div></details>";
   }
 
