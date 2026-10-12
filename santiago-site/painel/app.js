@@ -424,24 +424,54 @@
     return s.split(",").map(function (n) { return n.trim(); }).filter(Boolean);
   }
 
+  // Convidados de cortesia (não entram nas contas do dashboard). Chave = código da família,
+  // valor = primeiros nomes (sem acento, minúsculo) de quem é cortesia nela.
+  var CORTESIA = {
+    PAULA03: ["paula", "lenivaldo"],
+    MIVO: ["leandre", "josivanda"],
+    BEATRIZ: ["beatriz", "adriano", "constancia"],
+    PRIMOS: ["ariane", "gabriel"],
+    CAT: ["jose", "thayna"],
+    ISAAC: ["jorge", "ana beatriz"],
+    BOMBOM: ["lucas", "isabela"]
+  };
+
+  function normName(s) {
+    return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
+  }
+  // "José José Victor Silva" casa com "jose"; "Ana Beatriz Rosa" casa com "ana beatriz"
+  function cortesiaKey(codigo, nome) {
+    var list = CORTESIA[codigo]; if (!list) return null;
+    var n = normName(nome);
+    for (var i = 0; i < list.length; i++) {
+      if (n === list[i] || n.indexOf(list[i] + " ") === 0) return list[i];
+    }
+    return null;
+  }
+
   function computeDashboard() {
-    var d = { fam: 0, famVem: 0, famRecusou: 0, famAguardando: 0, vem: 0, nao: 0, aguardando: 0, total: 0, vao: [], naoVao: [], pend: [] };
+    var d = { fam: 0, famVem: 0, famRecusou: 0, famAguardando: 0, vem: 0, nao: 0, aguardando: 0, total: 0, vao: [], naoVao: [], pend: [], cort: [] };
     state.families.forEach(function (f) {
-      var vem = splitList(f.confirmado), nao = splitList(f.naoConfirmado);
-      var resp = !!(f.confirmado || f.naoConfirmado);
+      var vemAll = splitList(f.confirmado), naoAll = splitList(f.naoConfirmado);
       var pessoas = (f.pessoas && f.pessoas.length) || 0;
-      var familia = Math.max(pessoas, vem.length + nao.length, 1);
+
+      // quem é cortesia nessa família, e o que respondeu
+      var cortFam = {};
+      (f.pessoas || []).forEach(function (p) { var k = cortesiaKey(f.codigo, p); if (k) cortFam[k] = { nome: p, fam: f.nome, status: "Sem resposta" }; });
+      var vem = vemAll.filter(function (n) { var k = cortesiaKey(f.codigo, n); if (k) { (cortFam[k] = cortFam[k] || { nome: n, fam: f.nome }).status = "Vai"; (cortFam[k]).nome = n; return false; } return true; });
+      var nao = naoAll.filter(function (n) { var k = cortesiaKey(f.codigo, n); if (k) { (cortFam[k] = cortFam[k] || { nome: n, fam: f.nome }).status = "Não vai"; (cortFam[k]).nome = n; return false; } return true; });
+      var cortKeys = Object.keys(cortFam);
+      cortKeys.forEach(function (k) { d.cort.push(cortFam[k]); });
+
+      var familia = Math.max(0, Math.max(pessoas, vemAll.length + naoAll.length) - cortKeys.length);
       d.fam++;
-      d.total += familia;
-      d.vem += vem.length; d.nao += nao.length;
+      d.total += familia; d.vem += vem.length; d.nao += nao.length;
       vem.forEach(function (n) { d.vao.push({ nome: n, fam: f.nome }); });
       nao.forEach(function (n) { d.naoVao.push({ nome: n, fam: f.nome }); });
       if (f.confirmado) d.famVem++;
       else if (f.naoConfirmado) d.famRecusou++;
-      else d.famAguardando++;
-      var falta = familia - vem.length - nao.length;
-      if (!resp) { d.aguardando += familia; d.pend.push(f); }
-      else if (falta > 0) d.aguardando += falta;
+      else { d.famAguardando++; d.pend.push(f); }
+      d.aguardando += Math.max(0, familia - vem.length - nao.length);
     });
     return d;
   }
@@ -485,7 +515,7 @@
             '<div class="lg"><i style="background:var(--ok)"></i>Vão<b>' + d.vem + "</b></div>" +
             '<div class="lg"><i style="background:var(--danger)"></i>Não vão<b>' + d.nao + "</b></div>" +
             '<div class="lg"><i style="background:#d9cfb8"></i>Sem resposta<b>' + d.aguardando + "</b></div>" +
-            '<div class="lg" style="color:var(--ink-soft)">Pessoas convidadas<b style="color:var(--ink)">' + d.total + "</b></div>" +
+            '<div class="lg" style="color:var(--ink-soft)">Convidados (sem cortesia)<b style="color:var(--ink)">' + d.total + "</b></div>" +
           "</div>" +
         "</div>" +
         '<div class="dash-sub"><span>Famílias que responderam</span><b>' + famResp + " de " + d.fam + " (" + Math.round(famResp / Math.max(1, d.fam) * 100) + "%)</b></div>" +
@@ -501,6 +531,7 @@
       "</div>" +
       '<details class="dash-list" open><summary><i style="background:var(--ok)"></i>Quem vai<em>' + d.vem + '</em></summary><div class="dash-names">' + names(d.vao, true) + "</div></details>" +
       '<details class="dash-list"><summary><i style="background:var(--danger)"></i>Quem não vai<em>' + d.nao + '</em></summary><div class="dash-names">' + names(d.naoVao, true) + "</div></details>" +
+      '<details class="dash-list"><summary><i style="background:var(--blue)"></i>Cortesia (fora da conta)<em>' + d.cort.length + '</em></summary><div class="dash-names">' + d.cort.map(function (x) { return "<div><span>" + escapeHtml(x.nome) + "</span><small>" + escapeHtml(x.status) + " · " + escapeHtml(x.fam) + "</small></div>"; }).join("") + "</div></details>" +
       '<details class="dash-list"><summary><i style="background:#d9cfb8"></i>Famílias sem resposta<em>' + d.famAguardando + '</em></summary><div class="dash-names">' + pendHtml + "</div></details>";
   }
 
