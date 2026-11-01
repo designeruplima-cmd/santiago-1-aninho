@@ -265,6 +265,10 @@
       <div class="search-box">
         <input id="searchFamilias" type="text" placeholder="Buscar por nome ou código...">
       </div>
+      <div class="code-toggle" id="filtroFamilias">
+        <button type="button" data-filter="nao">Não confirmados <span id="cntNao"></span></button>
+        <button type="button" data-filter="sim">Confirmados <span id="cntSim"></span></button>
+      </div>
       <div id="familiasStatus" class="status-msg">Carregando...</div>
       <div id="familiasList"></div>
     </section>
