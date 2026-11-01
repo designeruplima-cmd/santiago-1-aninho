@@ -178,9 +178,29 @@
     });
   }
 
+  // filtro dos botões: "" = todos, "nao" = enviados + não enviados + recusados, "sim" = confirmados
+  var filtroFamilias = "";
+  var filtroEl = document.getElementById("filtroFamilias");
+
+  filtroEl.addEventListener("click", function (e) {
+    var btn = e.target.closest("button[data-filter]");
+    if (!btn) return;
+    filtroFamilias = filtroFamilias === btn.dataset.filter ? "" : btn.dataset.filter; // toque de novo = volta pra todos
+    renderFamilias();
+  });
+
   function renderFamilias() {
     var query = (searchFamilias.value || "").trim().toLowerCase();
+    var qtdSim = state.families.filter(function (f) { return !!f.confirmado; }).length;
+    document.getElementById("cntSim").textContent = "(" + qtdSim + ")";
+    document.getElementById("cntNao").textContent = "(" + (state.families.length - qtdSim) + ")";
+    Array.prototype.forEach.call(filtroEl.querySelectorAll("button"), function (b) {
+      b.classList.toggle("is-active", b.dataset.filter === filtroFamilias);
+    });
+
     var list = state.families.filter(function (f) {
+      if (filtroFamilias === "sim" && !f.confirmado) return false;
+      if (filtroFamilias === "nao" && f.confirmado) return false;
       if (!query) return true;
       return f.nome.toLowerCase().indexOf(query) > -1 || f.codigo.toLowerCase().indexOf(query) > -1;
     });
