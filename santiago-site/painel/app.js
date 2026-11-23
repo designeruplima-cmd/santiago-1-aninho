@@ -11,7 +11,6 @@
   var state = {
     pin: "",
     families: [],
-    guests: [],
     templates: [], // lista de mensagens salvas — uma delas tem ativo:true
     editingCode: null, // se preenchido, o form de "Adicionar" vira "Editar"
     editingTemplateId: null // se preenchido, o form de "Mensagem" vira "Editar"
@@ -64,7 +63,6 @@
         state.families = data.families || [];
         showApp();
         loadTemplates();
-        loadGuests();
       } else {
         pinError.textContent = "Não conseguimos entrar agora. Confira sua internet.";
       }
@@ -422,8 +420,6 @@
   // ---------------------------------------------------------------------
   var confirmadosStatus = document.getElementById("confirmadosStatus");
   var confirmadosList = document.getElementById("confirmadosList");
-  var guestsStatus = document.getElementById("guestsStatus");
-  var guestsList = document.getElementById("guestsList");
 
   // guarda quais famílias estão "abertas" na lista de confirmados, pra não
   // fechar tudo de novo toda vez que os dados são recarregados
@@ -456,7 +452,7 @@
     BOMBOM: ["lucas", "isabela"]
   };
   var CRIANCAS = {
-    PRIMOS: ["estevao", "tomaz", "afonso"],
+    PRIMOS: ["estevao", "tomaz"],
     ASTRO: ["pedrinho"],
     MAURA: ["maria flor"],
     ISAAC: ["isaac"],
@@ -464,18 +460,30 @@
     LUAN: ["noah"],
     TATA: ["davi"],
     MION: ["jose", "joao", "maria"],
-    VIVIAN: ["gabriel", "maria eduarda"],
+    VIVIAN: ["gabriel"],
     GUIDIN: ["guido"],
-    GEMIOS01: ["mateos", "felipe"],
+    GEMIOS01: ["mateos"],
     KENNIA: ["agatha"],
     RIOCLASSICA: ["tereza", "isabel"],
     MARI: ["estela", "maria luiza"],
     RICARDO: ["ester"],
-    PENTEADO: ["pedro"],
     NELMA7: ["maria julia"],
     QUEQUEL: ["malu"],
+    ANTHONY: ["anthony"]
+  };
+
+  // Fora de qualquer conta: ainda não vieram ao mundo ou não contam como convidados.
+  // Não aparecem em Vão, Não vão, Sem resposta nem em Crianças.
+  var IGNORAR = {
+    PRIMOS: ["afonso"],
+    GEMIOS01: ["felipe"],
     TRIGEMEOS: ["gemeos", "helena"]
   };
+  function ignorado(codigo, nome) {
+    var list = IGNORAR[codigo]; if (!list) return false;
+    var n = normName(nome);
+    return list.some(function (k) { return n === k || n.indexOf(k + " ") === 0; });
+  }
 
   function normName(s) {
     return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
@@ -496,12 +504,14 @@
   function computeDashboard() {
     var d = { fam: 0, famVem: 0, famRecusou: 0, famAguardando: 0, vem: 0, nao: 0, aguardando: 0, total: 0, vao: [], naoVao: [], pend: [], fora: [] };
     state.families.forEach(function (f) {
-      var vemAll = splitList(f.confirmado), naoAll = splitList(f.naoConfirmado);
-      var pessoas = (f.pessoas && f.pessoas.length) || 0;
+      var naoIgn = function (n) { return !ignorado(f.codigo, n); };
+      var vemAll = splitList(f.confirmado).filter(naoIgn), naoAll = splitList(f.naoConfirmado).filter(naoIgn);
+      var pessoasLista = (f.pessoas || []).filter(naoIgn);
+      var pessoas = pessoasLista.length;
 
       // quem está fora da conta (cortesia ou criança) nessa família, e o que respondeu
       var foraFam = {};
-      (f.pessoas || []).forEach(function (p) { var r = foraKey(f.codigo, p); if (r) foraFam[r.k] = { nome: p, fam: f.nome, tipo: r.tipo, status: "Sem resposta" }; });
+      pessoasLista.forEach(function (p) { var r = foraKey(f.codigo, p); if (r) foraFam[r.k] = { nome: p, fam: f.nome, tipo: r.tipo, status: "Sem resposta" }; });
       function marca(n, status) {
         var r = foraKey(f.codigo, n); if (!r) return true;
         var e = foraFam[r.k] = foraFam[r.k] || { fam: f.nome, tipo: r.tipo };
@@ -536,11 +546,6 @@
     var prazoTxt = Date.now() >= PRAZO_CONFIRMACAO ? "Prazo de confirmação encerrado em 31/10."
       : "Prazo para confirmar: 31/10 (faltam " + dias + (dias === 1 ? " dia" : " dias") + ").";
 
-    var guestsMarcados = state.guests.filter(function (g) { return g.confirmado; }).length;
-    var guestsHtml = state.guests.length
-      ? '<div class="dash-sub"><span>Lista pessoa a pessoa</span><b>' + guestsMarcados + " de " + state.guests.length + ' marcados</b></div>' +
-        '<div class="seg"><span style="width:' + Math.round(guestsMarcados / state.guests.length * 100) + '%;background:var(--blue)"></span></div>'
-      : "";
 
     function names(list, withFam) {
       return list.map(function (x) {
@@ -577,7 +582,6 @@
         '<div class="dash-sub"><span>Famílias que responderam</span><b>' + famResp + " de " + d.fam + " (" + Math.round(famResp / Math.max(1, d.fam) * 100) + "%)</b></div>" +
         '<div class="seg"><span style="width:' + (d.famVem / Math.max(1, d.fam) * 100) + '%;background:var(--ok)"></span>' +
           '<span style="width:' + (d.famRecusou / Math.max(1, d.fam) * 100) + '%;background:var(--danger)"></span></div>' +
-        guestsHtml +
         '<div class="dash-tiles">' +
           '<div class="tile"><b>' + d.famVem + "</b><span>famílias vêm</span></div>" +
           '<div class="tile"><b>' + d.famRecusou + "</b><span>recusaram</span></div>" +
@@ -640,67 +644,6 @@
     var codigo = row.dataset.codigo;
     expandedConfirmados[codigo] = !expandedConfirmados[codigo];
     row.classList.toggle("is-open", expandedConfirmados[codigo]);
-  });
-
-  function loadGuests() {
-    guestsStatus.textContent = "Carregando...";
-    callGet("listGuests").then(function (data) {
-      if (data.status === "ok") {
-        state.guests = data.guests || [];
-        guestsStatus.textContent = "";
-        renderGuests();
-        renderDashboard();
-      } else {
-        guestsStatus.textContent = "Não consegui carregar a lista de convidados.";
-        guestsStatus.classList.add("error");
-      }
-    }).catch(function () {
-      guestsStatus.textContent = "Sem conexão — confira sua internet.";
-      guestsStatus.classList.add("error");
-    });
-  }
-
-  function renderGuests() {
-    renderDashboard();
-    guestsList.innerHTML = "";
-    if (!state.guests.length) {
-      guestsList.innerHTML = '<div class="empty-state">Nenhum convidado na lista.</div>';
-      return;
-    }
-    state.guests.forEach(function (guest) {
-      var row = document.createElement("div");
-      row.className = "guest-row";
-      row.innerHTML =
-        '<span>' + escapeHtml(guest.nome) + '</span>' +
-        '<span class="guest-check' + (guest.confirmado ? " is-checked" : "") + '" data-row="' + guest.row + '">' +
-        (guest.confirmado ? "✓" : "") + '</span>';
-      guestsList.appendChild(row);
-    });
-  }
-
-  guestsList.addEventListener("click", function (e) {
-    var check = e.target.closest(".guest-check");
-    if (!check) return;
-    var row = Number(check.dataset.row);
-    var guest = state.guests.find(function (g) { return g.row === row; });
-    if (!guest) return;
-    var newValue = !guest.confirmado;
-
-    // atualização otimista — reflete na hora, corrige se der erro
-    guest.confirmado = newValue;
-    renderGuests();
-
-    callPost("toggleGuest", { row: row, confirmed: newValue }).then(function (data) {
-      if (data.status !== "ok") {
-        guest.confirmado = !newValue;
-        renderGuests();
-        alert("Não consegui salvar essa marcação. Tenta de novo.");
-      }
-    }).catch(function () {
-      guest.confirmado = !newValue;
-      renderGuests();
-      alert("Sem conexão — a marcação não foi salva.");
-    });
   });
 
   // ---------------------------------------------------------------------
