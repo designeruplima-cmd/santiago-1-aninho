@@ -485,6 +485,60 @@
     return list.some(function (k) { return n === k || n.indexOf(k + " ") === 0; });
   }
 
+  // Nomes exibidos no resumo (o cadastro guarda "Norma Norma", "Guido Guido Barros...").
+  // Chave = código da família + "|" + nome cadastrado sem acento, minúsculo.
+  var NOMES = {
+    "NORMA01|norma norma": "Norma",
+    "NORMA01|alanna alanna": "Alanna",
+    "RAUL02|raulino jose silva": "Raulino José Silva",
+    "RAUL02|crislayne antero": "Crislayne Antero",
+    "RAUL02|jobson antero": "Jobson Antero",
+    "RAUL02|geane lucia geraldo": "Geane Lúcia Geraldo",
+    "DANIELE6|daniele daniele sousa": "Daniele Sousa",
+    "DANIELE6|edimilson edmilson": "Edmilson",
+    "DANIELE6|ruberlandia ruberlandia": "Ruberlândia",
+    "NELMA7|nelma nelma santos": "Nelma Santos",
+    "NELMA7|paulo robson paulo robson santos": "Paulo Robson Santos",
+    "NELMA7|maria julia maria julia santos": "Maria Julia Santos",
+    "KENNIA|agatha": "Agatha Pereira",
+    "VIVIAN|gabriel": "Gabriel Silva",
+    "LUCIA|lucia ana lucia bento": "Ana Lucia Bento",
+    "JUZAO|julia julia santana fernandes vianna": "Julia Sant’ana Fernandes Vianna",
+    "JUZAO|isabele isabelle velozo sendra da silva": "Isabelle Velozo Sendra da Silva",
+    "WENDELL|wendell wendell de souza de lima": "Wendell de Souza de Lima",
+    "WENDELL|claudia claudia cassiana da silva de lima": "Claudia Cassiana da Silva de Lima",
+    "LUCAS|lucas lucas cassiano de lima": "Lucas Cassiano de Lima",
+    "RIOCLASSICA|isabel": "Isabel Duarte",
+    "RIOCLASSICA|tereza": "Tereza Duarte",
+    "PINGO|luiza luiza ferreira": "Luíza Ferreira",
+    "PINGO|jonny jonny": "Jonny",
+    "PINGO|vinicius vinicius": "Vinicius",
+    "CACAU|vinicius vinicius de paula": "Vinicius de Paula",
+    "GUIDIN|emanuelle emanuelle moreira barros amaral": "Emanuelle Moreira Barros Amaral",
+    "GUIDIN|ben hur ben hur carvalho de souza": "Ben Hur Carvalho de Souza",
+    "GUIDIN|guido guido barros carvalho de souza": "Guido Barros Carvalho de Souza",
+    "PAZ|jose antonio jose (neguinho)": "Antônio José (Neguinho)",
+    "PAZ|maria da paz maria da paz (tia da paz)": "Maria da Paz (Tia da Paz)",
+    "BEATRIZ|beatriz": "Beatriz Silva",
+    "BEATRIZ|adriano": "Adriano Amaral",
+    "BEATRIZ|constancia": "Constancia Silva",
+    "MIVO|leandre leandre de souza de lima": "Leandre de Souza de Lima",
+    "MIVO|josivanda josivanda de souza de lima": "Josivanda de Souza de Lima",
+    "PRIMOS|ariane": "Ariane Amaral",
+    "PRIMOS|gabriel": "Gabriel França",
+    "PRIMOS|estevao": "Estevão França",
+    "PRIMOS|tomaz": "Tomaz França",
+    "CAT|jose jose victor silva dos santos": "José Victor Silva dos Santos",
+    "CAT|thayna thayna osorio monteiro": "Thayná Osório Monteiro",
+    "CAT|catarina catarina osorio dos santos": "Catarina Osório dos Santos",
+    "FITS|grazi graziele araujo": "Graziele Araujo",
+    "FITS|janaina janaina moreira": "Janaína Moreira",
+    "ANTHONY|robert barros de carvalho": "Robert Barros de Carvalho"
+  };
+  function nm(codigo, nome) {
+    return NOMES[codigo + "|" + normName(nome)] || nome;
+  }
+
   function normName(s) {
     return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/\s+/g, " ").trim();
   }
@@ -511,11 +565,11 @@
 
       // quem está fora da conta (cortesia ou criança) nessa família, e o que respondeu
       var foraFam = {};
-      pessoasLista.forEach(function (p) { var r = foraKey(f.codigo, p); if (r) foraFam[r.k] = { nome: p, fam: f.nome, tipo: r.tipo, status: "Sem resposta" }; });
+      pessoasLista.forEach(function (p) { var r = foraKey(f.codigo, p); if (r) foraFam[r.k] = { nome: nm(f.codigo, p), fam: f.nome, tipo: r.tipo, status: "Sem resposta" }; });
       function marca(n, status) {
         var r = foraKey(f.codigo, n); if (!r) return true;
         var e = foraFam[r.k] = foraFam[r.k] || { fam: f.nome, tipo: r.tipo };
-        e.nome = n; e.status = status; return false;
+        e.nome = nm(f.codigo, n); e.status = status; return false;
       }
       var vem = vemAll.filter(function (n) { return marca(n, "Vai"); });
       var nao = naoAll.filter(function (n) { return marca(n, "Não vai"); });
@@ -525,8 +579,8 @@
       var familia = Math.max(0, Math.max(pessoas, vemAll.length + naoAll.length, 1) - foraKeys.length);
       d.fam++;
       d.total += familia; d.vem += vem.length; d.nao += nao.length;
-      vem.forEach(function (n) { d.vao.push({ nome: n, fam: f.nome }); });
-      nao.forEach(function (n) { d.naoVao.push({ nome: n, fam: f.nome }); });
+      vem.forEach(function (n) { d.vao.push({ nome: nm(f.codigo, n), fam: f.nome }); });
+      nao.forEach(function (n) { d.naoVao.push({ nome: nm(f.codigo, n), fam: f.nome }); });
       if (f.confirmado) d.famVem++;
       else if (f.naoConfirmado) d.famRecusou++;
       else { d.famAguardando++; d.pend.push(f); }
