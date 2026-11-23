@@ -217,7 +217,7 @@
       <img class="hero-logo" src="assets/logo.png" alt="Santiago, 1 aninho">
       <p class="lede">Venha brincar com o Santiago no seu primeiro aninho!</p>
       <div class="hero-card">
-        <b>28 de novembro · 12h</b>
+        <b>28 de novembro · 12h às 17h</b>
         <span>Vila Encantada 1</span>
         <span>Av. Vicente de Carvalho, 1329 · Penha Circular, Rio de Janeiro</span>
       </div>
@@ -369,8 +369,8 @@
 <script>
   (function () {
     // ---- Preencha aqui quando tiver. Vazio = não aparece no site. ----
-    var PAIS_WHATSAPP = "";   // só dígitos com DDI e DDD, ex.: "5521999999999"
-    var DICA_CHEGADA = "";    // texto curto: estacionamento, ponto de referência
+    var PAIS_WHATSAPP = "5521969390602";   // só dígitos com DDI e DDD
+    var DICA_CHEGADA = "Vila Encantada 1, Av. Vicente de Carvalho, 1329, Penha Circular. O botão abaixo abre a rota no seu mapa.";
     // -------------------------------------------------------------------
     var INICIO = new Date("2026-11-28T12:00:00-03:00").getTime();
     var DIA_INI = new Date("2026-11-28T00:00:00-03:00").getTime();
@@ -401,7 +401,7 @@
     // calendário (.ics)
     var ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Santiago//1 aninho//PT", "BEGIN:VEVENT",
       "UID:aninho-santiago-20261128@santiago", "DTSTAMP:20261122T000000Z",
-      "DTSTART:20261128T150000Z", "DTEND:20261128T190000Z",
+      "DTSTART:20261128T150000Z", "DTEND:20261128T200000Z",
       "SUMMARY:Primeiro aninho do Santiago", "LOCATION:Vila Encantada 1\\, " + ENDERECO.replace(/,/g, "\\,"),
       "END:VEVENT", "END:VCALENDAR"].join("\r\n");
     var cal = document.getElementById("cal");
