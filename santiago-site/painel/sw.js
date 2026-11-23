@@ -11,7 +11,7 @@
 // celular abrir o app de novo, em vez de ficar presa no cache até alguém
 // bumpar o CACHE_NAME manualmente. Ícones e manifesto (que quase nunca
 // mudam) continuam "cache primeiro", pra abrir mais rápido.
-var CACHE_NAME = "painel-santiago-v5";
+var CACHE_NAME = "painel-santiago-v6";
 var SHELL_URLS = [
   "./",
   "./index.html",

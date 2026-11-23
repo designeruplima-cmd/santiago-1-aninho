@@ -495,6 +495,7 @@
     "RAUL02|jobson antero": "Jobson Antero",
     "RAUL02|geane lucia geraldo": "Geane Lúcia Geraldo",
     "DANIELE6|daniele daniele sousa": "Daniele Sousa",
+    "DANIELE6|nildete (deta) nildete": "Nildete (Deta)",
     "DANIELE6|edimilson edmilson": "Edmilson",
     "DANIELE6|ruberlandia ruberlandia": "Ruberlândia",
     "NELMA7|nelma nelma santos": "Nelma Santos",
