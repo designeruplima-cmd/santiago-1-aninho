@@ -3,109 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Santiago — Como Chegar</title>
-<style>
-  :root {
-    --cream: #fbf9f4; --cream2: #f2ede0; --tan-light: #f7dd99; --tan: #eaa200;
-    --brown: #eaa200; --blue: #2e86ab; --espresso: #332f28; --ink: #332f28;
-    --ink-soft: #83796a; --card: #ffffff; --line: #ece5d4; --shadow: rgba(40, 35, 25, 0.13);
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; background: var(--cream); }
-  body {
-    color: var(--ink); font-family: "Work Sans", ui-sans-serif, system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased; padding: 0 0 72px;
-    display: flex; flex-direction: column; align-items: center; position: relative;
-    background-image:
-      linear-gradient(180deg, var(--cream) 0, var(--cream) 110px, rgba(251,249,244,.65) 220px, rgba(251,249,244,0) 380px),
-      url("assets/bg.png");
-    background-repeat: no-repeat, no-repeat;
-    background-position: top center, top center;
-    background-size: 100% 380px, 122vw auto;
-  }
-  .topbar {
-    position: sticky; top: 0; z-index: 10; width: 100%; background: var(--brown); color: #fff;
-    text-align: center; padding: 13px 16px; font-size: 17px; font-weight: 700;
-    letter-spacing: 0.06em; text-transform: uppercase; font-variant-numeric: tabular-nums;
-  }
-  .topbar strong { font-weight: 700; }
-  .back-link {
-    display: inline-flex; align-items: center; gap: 6px;
-    text-decoration: none; color: var(--brown); font-weight: 700;
-    font-size: 18px; margin: 4px 0 16px;
-  }
-  .back-link:hover { text-decoration: underline; }
-
-  .wrap { width: 100%; max-width: 560px; padding: 24px 20px 0; }
-  .page-kicker {
-    text-align: center; font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--blue); margin: 22px 0 8px;
-  }
-  .page-title {
-    font-family: "Fraunces", serif; font-weight: 640; font-size: clamp(26px, 7vw, 36px);
-    text-align: center; color: var(--ink); margin: 0 0 8px; text-wrap: balance;
-  }
-  .page-lede { text-align: center; color: var(--ink-soft); font-size: 16.5px; max-width: 36ch; margin: 0 auto 30px; }
-
-  .place-card {
-    background: var(--card); border: 1px solid var(--line); border-radius: 22px;
-    padding: 28px 24px; box-shadow: 0 14px 30px -20px var(--shadow); text-align: center;
-    margin-bottom: 40px;
-  }
-  .place-card svg { color: var(--brown); margin-bottom: 12px; }
-  .place-name {
-    font-family: "Fraunces", serif; font-weight: 640; font-size: 22px; color: var(--ink); margin: 0 0 6px;
-  }
-  .place-address { color: var(--ink-soft); font-size: 16.5px; margin: 0 0 22px; line-height: 1.5; }
-  .map-btn {
-    display: inline-block; text-decoration: none; border-radius: 999px; padding: 13px 26px;
-    background: var(--brown); color: #fff; font-family: "Fraunces", serif; font-weight: 600; font-size: 17px;
-  }
-  .tip {
-    margin-top: 22px; padding-top: 18px; border-top: 1px dashed var(--line);
-    font-size: 15.5px; color: var(--ink-soft); font-style: italic; text-align: left;
-  }
-
-  footer { text-align: center; font-size: 13.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
-</style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,380..700;1,9..144,380..700&family=Work+Sans:wght@400;500;600&display=swap">
+<title>Santiago, 1 Aninho</title>
+<meta http-equiv="refresh" content="0; url=index.html#festa">
+<script>location.replace("index.html#festa");</script>
 </head>
-<body>
-
-<div class="topbar" id="topbar">carregando…</div>
-
-<div class="wrap">
-  <a class="back-link" href="index.html">← Início</a>
-  <p class="page-kicker">onde vamos brincar</p>
-  <h1 class="page-title">Como chegar</h1>
-  <p class="page-lede">O ponto de encontro da nossa brincadeira.</p>
-
-  <div class="place-card">
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s7-6.1 7-11.5A7 7 0 1 0 5 9.5C5 14.9 12 21 12 21Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9.5" r="2.3" stroke="currentColor" stroke-width="1.8"/></svg>
-    <p class="place-name">Vila Encantada 1</p>
-    <p class="place-address">Av. Vicente de Carvalho, 1329<br>Penha Circular, Rio de Janeiro — RJ</p>
-    <a class="map-btn" href="https://www.google.com/maps/search/?api=1&query=Av.+Vicente+de+Carvalho%2C+1329+-+Penha+Circular%2C+Rio+de+Janeiro+-+RJ" target="_blank" rel="noopener">Ver no mapa</a>
-    <p class="tip"><em>Espaço reservado para dicas de chegada</em> — estacionamento, ponto de referência ou observação sobre o trânsito da região. Me conta o que quer incluir aqui.</p>
-  </div>
-
-  <footer>Vila Encantada 1 · Rio de Janeiro</footer>
-</div>
-
-<script>
-  (function () {
-    var target = new Date("2026-11-28T12:00:00-03:00").getTime();
-    var bar = document.getElementById("topbar");
-    function tick() {
-      var diff = target - Date.now();
-      if (diff <= 0) { bar.textContent = "É hoje! ✈️"; return; }
-      var d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000),
-          m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
-      bar.innerHTML = "Faltam <strong>" + d + "</strong>d · <strong>" + String(h).padStart(2,"0") + "</strong>h · <strong>" + String(m).padStart(2,"0") + "</strong>min · <strong>" + String(s).padStart(2,"0") + "</strong>s";
-    }
-    tick();
-    setInterval(tick, 1000);
-  })();
-</script>
+<body style="font-family:sans-serif;text-align:center;padding:40px;color:#332f28;background:#fbf9f4">
+<p>Levando você para o site do Santiago... <a href="index.html#festa">Toque aqui se não abrir.</a></p>
 </body>
 </html>

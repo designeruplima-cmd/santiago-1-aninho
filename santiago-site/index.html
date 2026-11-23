@@ -68,37 +68,6 @@
     padding: clamp(20px, 6vw, 36px) 16px 0;
   }
 
-  /* ---------- nav grid ---------- */
-  .nav-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-    margin: 6px 0 20px;
-  }
-  .nav-tile {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 14px;
-    text-align: left;
-    text-decoration: none;
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    padding: 18px 20px;
-    box-shadow: 0 14px 30px -20px var(--shadow);
-    color: var(--ink);
-  }
-  .nav-tile:nth-child(even) { background: #f4f4f3; }
-  .nav-tile svg { color: var(--brown); flex: none; }
-  .nav-tile span {
-    font-family: "Fraunces", serif;
-    font-weight: 600;
-    font-size: 16.5px;
-    line-height: 1.25;
-  }
-
   .hero-logo {
     display: block;
     width: min(360px, 78%);
@@ -168,138 +137,289 @@
     color: var(--ink-soft);
   }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .sheet > * { animation: fade 0.7s ease both; }
-    .nav-grid { animation-delay: 0.12s; }
-  }
-  @keyframes fade { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none; } }
-
+  
   @media (max-width: 480px) {
     .sheet { padding-left: 22px; padding-right: 22px; }
     .hero-logo { width: min(260px, 72%); }
     .lede { font-size: 16px; max-width: 30ch; }
   }
+
+  [hidden] { display: none !important; }
+  body { padding-bottom: 104px; }
+  .lede { margin: 14px auto 22px; }
+  .lede.big { font-family: "Fraunces", serif; font-weight: 700; font-size: 26px; line-height: 1.15; color: var(--ink); max-width: 20ch; }
+  .hero-photo { display: block; width: 100%; max-height: 300px; object-fit: cover; object-position: center 30%; border-radius: 22px; margin: 0 0 18px; box-shadow: 0 14px 30px -20px var(--shadow); }
+
+  .hero-card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+    padding: 18px 20px; box-shadow: 0 14px 30px -20px var(--shadow);
+    display: grid; gap: 4px; text-align: center; margin: 0 0 14px;
+  }
+  .hero-card b { font-family: "Fraunces", serif; font-size: 21px; }
+  .hero-card span { color: var(--ink-soft); font-size: 15px; }
+  .hero-card .big-addr { color: var(--ink); font-size: 18px; font-weight: 500; line-height: 1.35; }
+
+  .btn {
+    display: block; width: 100%; text-align: center; text-decoration: none;
+    font-family: "Work Sans", sans-serif; font-weight: 600; font-size: 16px;
+    padding: 15px 18px; border-radius: 16px; border: 1px solid var(--line);
+    background: var(--card); color: var(--ink); cursor: pointer;
+  }
+  .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .btn.amber { background: var(--brown); border-color: var(--brown); color: #fff; }
+  .btn:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  .actions { display: grid; gap: 10px; margin: 0 0 8px; }
+
+  .dica {
+    background: var(--cream2); border: 1px solid var(--line); border-radius: 16px;
+    padding: 14px 16px; font-size: 15px; margin: 0 0 14px; text-align: left;
+  }
+  .dica b { font-family: "Fraunces", serif; display: block; margin-bottom: 2px; }
+
+  .section { margin-top: 44px; }
+  .kicker { text-align: center; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--blue); margin: 0 0 6px; }
+  .section-title { text-align: center; font-family: "Fraunces", serif; font-weight: 700; font-size: 26px; margin: 0 0 8px; }
+  .section-lede { text-align: center; color: var(--ink-soft); margin: 0 auto 18px; max-width: 36ch; font-size: 15.5px; }
+
+  details.gift { background: var(--card); border: 1px solid var(--line); border-radius: 18px; margin: 0 0 10px; box-shadow: 0 14px 30px -22px var(--shadow); }
+  details.gift summary { list-style: none; cursor: pointer; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; font-family: "Fraunces", serif; font-weight: 600; font-size: 17px; }
+  details.gift summary::-webkit-details-marker { display: none; }
+  details.gift summary::after { content: "+"; color: var(--brown); font-size: 22px; line-height: 1; }
+  details.gift[open] summary::after { content: "\2212"; }
+  details.gift p { margin: 0; padding: 0 18px 18px; line-height: 1.6; }
+
+  .story-card { background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 20px; display: grid; gap: 12px; box-shadow: 0 14px 30px -20px var(--shadow); }
+  .story-card p { margin: 0; line-height: 1.65; }
+
+  .foto-card { background: var(--cream2); border: 1px solid var(--line); border-radius: 18px; padding: 16px 18px; text-align: center; display: grid; gap: 10px; margin: 0 0 18px; }
+  .foto-card b { font-family: "Fraunces", serif; font-size: 19px; }
+  .foto-card span { color: var(--ink-soft); font-size: 15px; }
+
+  .stickybar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    background: linear-gradient(0deg, var(--cream) 62%, rgba(251,249,244,0));
+  }
+  .stickybar .row { max-width: 568px; margin: 0 auto; display: grid; gap: 10px; }
+  .stickybar .row.two { grid-template-columns: 1fr 1fr; }
+  .stickybar .btn { box-shadow: 0 10px 24px -12px var(--shadow); }
 </style>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,380..700;1,9..144,380..700&family=Work+Sans:wght@400;500;600&display=swap">
 </head>
 <body>
 
 <div class="topbar" id="topbar">carregando contagem…</div>
 
-<div class="sheet">
-  <img class="hero-logo" src="assets/logo.png" alt="Santiago — 1 aninho">
-  <p class="lede">Venha brincar com o Santiago no seu primeiro aninho!</p>
+<main class="sheet">
 
-  <div class="nav-grid">
-    <a class="nav-tile" href="quando.html">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3" stroke="currentColor" stroke-width="1.8"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="1.8"/><line x1="7" y1="3" x2="7" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="17" y1="3" x2="17" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      <span>Quando é a festa</span>
-    </a>
-    <a class="nav-tile" href="como-chegar.html">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21s7-6.1 7-11.5A7 7 0 1 0 5 9.5C5 14.9 12 21 12 21Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="9.5" r="2.3" stroke="currentColor" stroke-width="1.8"/></svg>
-      <span>Como chegar</span>
-    </a>
-    <a class="nav-tile" href="confirmar.html">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M8 12.5l2.5 2.5L16 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-      <span>Confirmar presença</span>
-    </a>
-    <a class="nav-tile" href="presente.html">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="9" width="18" height="11" rx="1.5" stroke="currentColor" stroke-width="1.8"/><path d="M3 9h18M12 9v11M7.5 9a2.5 2.5 0 010-5C10 4 12 9 12 9c0 0 2-5 4.5-5a2.5 2.5 0 010 5" stroke="currentColor" stroke-width="1.8"/></svg>
-      <span>Sugestão de presente</span>
-    </a>
-    <a class="nav-tile" href="galeria.html">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><circle cx="8.5" cy="10" r="1.6" stroke="currentColor" stroke-width="1.8"/><path d="M3 15.5l5-4 4.5 4L16 12l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
-      <span>Galeria de fotos</span>
-    </a>
-    <a class="nav-tile" href="quem.html">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/><path d="M8.5 14.5c1 1.2 2.2 1.8 3.5 1.8s2.5-.6 3.5-1.8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
-      <span>Minha história</span>
-    </a>
-    <a class="nav-tile" href="fotos-convidados.html">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 011 1v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9a1 1 0 011-1Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.4" stroke="currentColor" stroke-width="1.8"/></svg>
-      <span>Mande sua foto na festa</span>
-    </a>
-  </div>
+  <!-- ===== TOPO: muda com a data ===== -->
+  <section id="festa">
+    <div data-f="antes">
+      <img class="hero-logo" src="assets/logo.png" alt="Santiago, 1 aninho">
+      <p class="lede">Venha brincar com o Santiago no seu primeiro aninho!</p>
+      <div class="hero-card">
+        <b>28 de novembro · 12h</b>
+        <span>Vila Encantada 1</span>
+        <span>Av. Vicente de Carvalho, 1329 · Penha Circular, Rio de Janeiro</span>
+      </div>
+      <div class="actions">
+        <a class="btn primary" data-rota href="#" target="_blank" rel="noopener">Como chegar</a>
+        <a class="btn" id="cal" href="#" download="aninho-santiago.ics">Adicionar ao calendário</a>
+      </div>
+    </div>
 
-  <p class="photo-carousel-title">Fotinhos do Santiago</p>
-  <div class="photo-carousel">
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-01.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-02.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-03.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-04.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-05.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-06.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-07.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-08.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-09.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-10.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-11.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-12.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-13.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-14.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-15.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-16.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-17.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-18.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-19.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-20.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-21.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-22.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-23.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-24.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-25.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-26.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-27.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-28.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-29.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-30.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-31.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-32.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-33.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-34.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-35.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-36.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-37.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-38.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-39.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-40.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-41.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-42.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-43.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-44.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-45.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-46.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-47.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-48.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-49.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-50.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-51.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-52.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-53.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-54.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-55.jpg" alt="Santiago"></div>
-    <div class="frame"><img loading="lazy" src="assets/fotos/santiago-56.jpg" alt="Santiago"></div>
-  </div>
+    <div data-f="dia" hidden>
+      <img class="hero-logo" src="assets/logo.png" alt="Santiago, 1 aninho">
+      <p class="lede big">A festa começa às 12h</p>
+      <div class="hero-card">
+        <b>Vila Encantada 1</b>
+        <span class="big-addr">Av. Vicente de Carvalho, 1329<br>Penha Circular, Rio de Janeiro</span>
+      </div>
+      <div class="dica" id="dica" hidden><b>Dica de chegada</b><span id="dica-txt"></span></div>
+      <div class="actions">
+        <a class="btn primary" data-rota href="#" target="_blank" rel="noopener">Abrir rota agora</a>
+      </div>
+    </div>
+
+    <div data-f="depois" hidden>
+      <img class="hero-logo" src="assets/logo.png" alt="Santiago, 1 aninho">
+      <p class="lede big">Foi uma festa de gente querida</p>
+      <img class="hero-photo" src="assets/fotos/santiago-12.jpg" alt="Santiago sorrindo">
+      <p class="lede">Obrigado por brincar com a gente no primeiro aninho dele.</p>
+    </div>
+  </section>
+
+  <!-- ===== MEIO: presente e história (igual nos três momentos) ===== -->
+  <section class="section" id="presente">
+    <p class="kicker">mimo</p>
+    <h2 class="section-title">Sugestão de presente</h2>
+    <p class="section-lede">A presença de vocês já é o presente. Mas se quiserem mesmo trazer um mimo, aqui vão algumas ideias.</p>
+    <details class="gift"><summary>Livros</summary>
+      <p>O Ferreiro do Bosque, Mestre Dilis da Aldeia, a coleção do Pedro Coelho, os clássicos da Beatrix Potter, os contos de Julio Verne e as historinhas dos Irmãos Grimm. Livros interativos e sensoriais também caem bem nessa fase — de pano, com textura, com aba pra levantar — e um livrinho em inglês ou em francês sempre ganha um cantinho na estante dele.</p>
+    </details>
+    <details class="gift"><summary>Roupinhas</summary>
+      <p>Blusas, calças, shorts e sapatos. Só confirma com a gente o tamanho do pezinho antes de comprar, porque essa parte muda rápido.</p>
+    </details>
+    <details class="gift"><summary>Brinquedos</summary>
+      <p>Painéis sensoriais, brinquedos educativos, carrinhos e caixinha de ferramentas. Blocos grandes de encaixar, quebra-cabeça de madeira, instrumento musical (tamborzinho, xilofone), bichinho de pelúcia e brinquedo de empilhar também são uma boa.</p>
+    </details>
+  </section>
+
+  <section class="section" id="historia">
+    <p class="kicker">minha historinha</p>
+    <h2 class="section-title">Minha história</h2>
+    <p class="section-lede">Um pouquinho sobre a minha vida nesse primeiro aninho, contada por mim mesmo.</p>
+    <div class="story-card">
+      <p>Oi, eu sou o Santiago! Deixa eu contar como tudo começou: meus pais decidiram que queriam um bebê, e três semanas depois já veio o positivo — eu vim rapidinho, bem mais rápido do que os dois esperavam. A gravidez inteira foi agitada, porque minha mãe não conseguia ficar parada nem um minuto, e acho que aprendi isso ainda lá dentro da barriga. Na hora de nascer, eu demorei pra decidir que estava pronto pra sair, mas quando cheguei, cheguei com muita saúde: dia 17 de novembro de 2025, pesando 3kg e 300g.</p>
+      <p>Ninguém me chama de chorão. Desde cedo sou sorridente, esperto, e vou passando por cada fase antes do esperado. Curto barulho, música e dançar, e vivo aprontando as minhas gracinhas. Como super bem desde que comecei a experimentar comida, e adoro transformar a água do meu copo numa bagunça só, fazendo bolinha com o que era pra ser só de beber.</p>
+      <p>Não tenho medo nem de água gelada: já sou fã de aventura, trilha, cachoeira, praia e de qualquer bicho que aparecer na frente, sempre com muita curiosidade. Gosto de tomar banho e aprontar com o papai, e canto e danço pela casa com a mamãe. Sou super carinhoso, gosto de um bom chameguinho, e já acordo sorrindo, gargalhando, brincando e conversando bastante. E claro, curto a bagunça de brincar com os primos e a companhia dos avós.</p>
+    </div>
+  </section>
+
+  <!-- ===== FIM: fotos ===== -->
+  <section class="section" id="fotos">
+    <p class="kicker">momentos</p>
+    <h2 class="section-title">Fotinhos do Santiago</h2>
+
+    <div class="foto-card" data-f="antes">
+      <b>As fotos da festa entram aqui</b>
+      <span>Depois do dia 28, esta parte vira o álbum do Santiago.</span>
+    </div>
+    <div class="foto-card" data-f="dia" hidden>
+      <b>Tirou um clique bacana?</b>
+      <span>Manda pra gente. Cai direto no álbum do Santiago.</span>
+      <a class="btn amber" href="fotos-convidados.html">Enviar minhas fotos</a>
+    </div>
+    <div class="foto-card" data-f="depois" hidden>
+      <b>Mande suas fotos da festa</b>
+      <span>Elas entram no álbum do Santiago.</span>
+      <a class="btn amber" href="fotos-convidados.html">Enviar minhas fotos</a>
+    </div>
+
+    <div class="photo-carousel">
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-01.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-02.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-03.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-04.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-05.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-06.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-07.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-08.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-09.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-10.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-11.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-12.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-13.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-14.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-15.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-16.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-17.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-18.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-19.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-20.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-21.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-22.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-23.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-24.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-25.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-26.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-27.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-28.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-29.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-30.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-31.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-32.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-33.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-34.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-35.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-36.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-37.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-38.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-39.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-40.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-41.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-42.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-43.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-44.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-45.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-46.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-47.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-48.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-49.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-50.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-51.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-52.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-53.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-54.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-55.jpg" alt="Santiago"></div>
+      <div class="frame"><img loading="lazy" src="assets/fotos/santiago-56.jpg" alt="Santiago"></div>
+    </div>
+    <div class="actions" style="margin-top:10px"><a class="btn" href="galeria.html">Ver a galeria completa</a></div>
+  </section>
 
   <footer>Vila Encantada 1 · Rio de Janeiro</footer>
+</main>
+
+<!-- ===== BOTÃO FIXO: muda com a data ===== -->
+<div class="stickybar">
+  <div class="row" data-f="antes"><a class="btn primary" data-rota href="#" target="_blank" rel="noopener">Abrir rota até a festa</a></div>
+  <div class="row" id="sticky-dia" data-f="dia" hidden><a class="btn primary" data-rota href="#" target="_blank" rel="noopener">Abrir rota agora</a><a class="btn" id="pais" href="#" hidden target="_blank" rel="noopener">Falar com os pais</a></div>
+  <div class="row" data-f="depois" hidden><a class="btn amber" href="fotos-convidados.html">Enviar minhas fotos</a></div>
 </div>
 
 <script>
   (function () {
-    var target = new Date("2026-11-28T12:00:00-03:00").getTime();
+    // ---- Preencha aqui quando tiver. Vazio = não aparece no site. ----
+    var PAIS_WHATSAPP = "";   // só dígitos com DDI e DDD, ex.: "5521999999999"
+    var DICA_CHEGADA = "";    // texto curto: estacionamento, ponto de referência
+    // -------------------------------------------------------------------
+    var INICIO = new Date("2026-11-28T12:00:00-03:00").getTime();
+    var DIA_INI = new Date("2026-11-28T00:00:00-03:00").getTime();
+    var DIA_FIM = new Date("2026-11-29T00:00:00-03:00").getTime();
+    var ENDERECO = "Av. Vicente de Carvalho, 1329 - Penha Circular, Rio de Janeiro - RJ";
+    var ROTA = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("Vila Encantada 1, " + ENDERECO);
+
+    function faseAtual() {
+      var q = /[?&]fase=(antes|dia|depois)/.exec(location.search);
+      if (q) return q[1];
+      var agora = Date.now();
+      if (agora < DIA_INI) return "antes";
+      if (agora < DIA_FIM) return "dia";
+      return "depois";
+    }
+    var fase = faseAtual();
+
+    document.querySelectorAll("[data-f]").forEach(function (el) { el.hidden = (el.dataset.f !== fase); });
+    document.querySelectorAll("[data-rota]").forEach(function (a) { a.href = ROTA; });
+
+    if (DICA_CHEGADA) { document.getElementById("dica").hidden = false; document.getElementById("dica-txt").textContent = DICA_CHEGADA; }
+    if (PAIS_WHATSAPP) {
+      var p = document.getElementById("pais");
+      p.href = "https://wa.me/" + PAIS_WHATSAPP; p.hidden = false;
+      document.getElementById("sticky-dia").classList.add("two");
+    }
+
+    // calendário (.ics)
+    var ics = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Santiago//1 aninho//PT", "BEGIN:VEVENT",
+      "UID:aninho-santiago-20261128@santiago", "DTSTAMP:20261122T000000Z",
+      "DTSTART:20261128T150000Z", "DTEND:20261128T190000Z",
+      "SUMMARY:Primeiro aninho do Santiago", "LOCATION:Vila Encantada 1\\, " + ENDERECO.replace(/,/g, "\\,"),
+      "END:VEVENT", "END:VCALENDAR"].join("\r\n");
+    var cal = document.getElementById("cal");
+    if (cal) cal.href = "data:text/calendar;charset=utf-8," + encodeURIComponent(ics);
+
+    // barra do topo
     var bar = document.getElementById("topbar");
     function tick() {
-      var diff = target - Date.now();
-      if (diff <= 0) { bar.textContent = "É hoje! ✈️"; return; }
-      var d = Math.floor(diff / 86400000);
-      var h = Math.floor((diff % 86400000) / 3600000);
-      var m = Math.floor((diff % 3600000) / 60000);
-      var s = Math.floor((diff % 60000) / 1000);
+      if (fase === "dia") { bar.textContent = "É hoje! A festa começa às 12h"; return; }
+      if (fase === "depois") { bar.textContent = "Obrigado por brincar com a gente"; return; }
+      var diff = INICIO - Date.now();
+      if (diff <= 0) { bar.textContent = "É hoje!"; return; }
+      var d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000),
+          m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
       bar.innerHTML = "Faltam <strong>" + d + "</strong>d · <strong>" + String(h).padStart(2,"0") + "</strong>h · <strong>" + String(m).padStart(2,"0") + "</strong>min · <strong>" + String(s).padStart(2,"0") + "</strong>s";
     }
     tick();
-    setInterval(tick, 1000);
+    if (fase === "antes") setInterval(tick, 1000);
   })();
 </script>
 </body>
