@@ -469,7 +469,8 @@
     RICARDO: ["ester"],
     NELMA7: ["maria julia"],
     QUEQUEL: ["malu"],
-    ANTHONY: ["anthony"]
+    ANTHONY: ["anthony"],
+    RAFA: ["heitor"]
   };
 
   // Fora de qualquer conta: ainda não vieram ao mundo ou não contam como convidados.
@@ -477,7 +478,8 @@
   var IGNORAR = {
     PRIMOS: ["afonso"],
     GEMIOS01: ["felipe"],
-    TRIGEMEOS: ["gemeos", "helena"]
+    TRIGEMEOS: ["gemeos", "helena"],
+    ALDI: ["leonardo"]
   };
   function ignorado(codigo, nome) {
     var list = IGNORAR[codigo]; if (!list) return false;
