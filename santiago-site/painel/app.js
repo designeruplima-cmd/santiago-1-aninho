@@ -478,8 +478,7 @@
   var IGNORAR = {
     PRIMOS: ["afonso"],
     GEMIOS01: ["felipe"],
-    TRIGEMEOS: ["gemeos", "helena"],
-    ALDI: ["leonardo"]
+    TRIGEMEOS: ["gemeos", "helena"]
   };
   function ignorado(codigo, nome) {
     var list = IGNORAR[codigo]; if (!list) return false;
